@@ -1,2 +1,2 @@
-# Juego_Pokemon
+# Juego Pokemon
 Juego de Pokemon echo con python
