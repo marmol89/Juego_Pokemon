@@ -5,6 +5,7 @@ class menu:
     optionI = 0
     optionB = 0
     optionSE = 0
+    optionO = 0
 
     def __init__(self):
         os.system('clear')
@@ -37,7 +38,7 @@ class menu:
         
         for pokemon in pokemons:
             i = i + 1
-            print(i, pokemon)
+            print(i, pokemon.nombre)
         
         print("0 - Atras")
         print("")
@@ -58,3 +59,28 @@ class menu:
             return pokemons[self.optionSE - 1]
         
         return any
+    
+    def online(self):
+        print("-----POKEMONE MENU ONLINE-----")
+        print("")
+        print("Options: ")
+        print("1 - Login")
+        print("2 - Register")
+        print("0 - Atras")
+        print("")
+        self.optionO = input("Option: ")
+        os.system('clear')
+
+    def login(self):
+        print("-----POKEMONE MENU LOGIN-----")
+        print("")
+        username = input("USERNAME: ")
+        password = input("PASSWORD: ")
+        os.system('clear')
+        
+    def register(self):
+        print("-----POKEMONE MENU LOGIN-----")
+        print("")
+        username = input("USERNAME: ")
+        password = input("PASSWORD: ")
+        os.system('clear')
