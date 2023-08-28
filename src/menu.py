@@ -1,11 +1,13 @@
 import os
 import time
+from src.database.users import users
 
 class menu:
     optionI = 0
     optionB = 0
     optionSE = 0
     optionO = 0
+    user = any
 
     def __init__(self):
         os.system('clear')
@@ -72,15 +74,30 @@ class menu:
         os.system('clear')
 
     def login(self):
+        usersdb = users()
         print("-----POKEMONE MENU LOGIN-----")
         print("")
         username = input("USERNAME: ")
         password = input("PASSWORD: ")
+        data = usersdb.login(username, password)
+        if data == False:
+            print("Usuario o password incorrecto")
+        self.user = data
+        return self.user
         os.system('clear')
         
     def register(self):
+        usersdb = users()
         print("-----POKEMONE MENU LOGIN-----")
         print("")
         username = input("USERNAME: ")
         password = input("PASSWORD: ")
+
+        if usersdb.verificarUser(username):
+            print("El usuario ya esta registrado")
+            return
+        if usersdb.createUser(username, password):
+            print("Usuario registrado")
+        
+        self.user = usersdb.login(username, password)
         os.system('clear')
