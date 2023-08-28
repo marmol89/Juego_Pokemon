@@ -93,11 +93,17 @@ class menu:
         username = input("USERNAME: ")
         password = input("PASSWORD: ")
 
-        if usersdb.verificarUser(username):
+        if usersdb.verificarUser(username) == False:
+            os.system('clear')
             print("El usuario ya esta registrado")
+            time.sleep(3)
+            os.system('clear')
             return
         if usersdb.createUser(username, password):
+            os.system('clear')
             print("Usuario registrado")
+            time.sleep(3)
+            os.system('clear')
         
         self.user = usersdb.login(username, password)
         os.system('clear')

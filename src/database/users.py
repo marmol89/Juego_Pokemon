@@ -8,9 +8,9 @@ class users:
     def __init__(self):
         self.dbp = db().mydb
     
-    def cifrar_contrasena(self,contrasena):
-        contrasena_codificada = contrasena.encode('utf-8')
-        hashed = hashlib.pbkdf2_hmac('sha256', contrasena_codificada, self.salt, 100000)
+    def cifrar_contrasena(self, password):
+        passwordS = password + self.salt
+        hashed = hashlib.sha512(passwordS.encode()).hexdigest()
         return hashed
     
     def verificar_contrasena(self , contrasena, hashed):
@@ -20,31 +20,33 @@ class users:
     
     def verificarUser(self , username):
         mycursor = self.dbp.cursor()
-        sql = "SELECT * FROM users WHERE username = '%s'"
-        val = (username)
-        mycursor.execute(sql, val)
-        data = mycursor.fetchone()
-        if(len(data) > 0):
+        sql = "SELECT * FROM users WHERE username=%s"
+        mycursor.execute(sql , (username ,))
+        data = mycursor.fetchone()  
+        if(data == None):
             return True
         return False
 
-    def createUser(self,username,password):
+    def createUser(self, username, password):
         mycursor = self.dbp.cursor()
         sql = "INSERT INTO users (username, password) VALUES (%s, %s)"
+        print(username, password)
         val = (username, self.cifrar_contrasena(password))
         mycursor.execute(sql, val)
+        self.dbp.commit()
         return True
     
     def login(self, username, password):
         mycursor = self.dbp.cursor()
-        sql = "SELECT * FROM users WHERE username = '%s' && WHERE password = '%s'"
-        val = (username, self.cifrar_contrasena(password))
-        mycursor.execute(sql, val)
+        sql = "SELECT * FROM users WHERE username=%s"
+        mycursor.execute(sql, (username ,))
         data = mycursor.fetchone()
-        if len(data) == 0:
+        if data == None:
             return False
-        if len(data) == 1:
-            userl = user(user[0], user[1], user[2])
+        if data[2] != self.cifrar_contrasena(password):
+            return False
+        if len(data) > 1:
+            userl = user(data[0], data[1], data[2])
             return userl
 
         
