@@ -1,5 +1,5 @@
 from src.database.db import db
-from src.user import user
+from src.models.user import user
 import hashlib
 
 class users:

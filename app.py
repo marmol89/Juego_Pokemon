@@ -1,7 +1,7 @@
-from src.menu import menu
-from src.pokemon import pokemon
+from src.menus.menu import menu
+from src.models.pokemon import pokemon
 from src.database.pokemonsDB import pokemonDB
-from src.menuLogin import menuLogin
+from src.menus.menuLogin import menuLogin
 
 
 #pokemon = pokemon('Charizard' , ['Fuego', 'Volador'], ['Cola Ala'], {'ataque' : 84, 'defensa' : 78}, 78)

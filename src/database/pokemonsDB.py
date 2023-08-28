@@ -1,5 +1,5 @@
 from src.database.db import db
-from src.pokemon import pokemon
+from src.models.pokemon import pokemon
 import json
 
 class pokemonDB:
