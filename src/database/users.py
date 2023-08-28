@@ -30,7 +30,6 @@ class users:
     def createUser(self, username, password):
         mycursor = self.dbp.cursor()
         sql = "INSERT INTO users (username, password) VALUES (%s, %s)"
-        print(username, password)
         val = (username, self.cifrar_contrasena(password))
         mycursor.execute(sql, val)
         self.dbp.commit()
@@ -42,9 +41,9 @@ class users:
         mycursor.execute(sql, (username ,))
         data = mycursor.fetchone()
         if data == None:
-            return False
+            return None
         if data[2] != self.cifrar_contrasena(password):
-            return False
+            return None
         if len(data) > 1:
             userl = user(data[0], data[1], data[2])
             return userl

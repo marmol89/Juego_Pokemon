@@ -22,6 +22,7 @@ def createTables():
     mycursor = mydb.cursor()
     mycursor.execute("CREATE TABLE pokemons (id int NOT NULL AUTO_INCREMENT ,nombre VARCHAR(255), tipos JSON, movimientos JSON, EVs JSON, puntos_de_salud int, PRIMARY KEY (id))")
     mycursor.execute("CREATE TABLE users (id int NOT NULL AUTO_INCREMENT ,username VARCHAR(255), password VARCHAR(600), PRIMARY KEY (id))")
+    mycursor.execute("CREATE TABLE rooms (id INT AUTO_INCREMENT PRIMARY KEY, user_id INT, enemigo_id INT, nombre VARCHAR(255), estado INT DEFAULT 0, FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (enemigo_id) REFERENCES users(id))")
     mycursor.close()
 
 def insetarPokemons():
