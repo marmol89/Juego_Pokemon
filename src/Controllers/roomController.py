@@ -16,8 +16,16 @@ class roomController:
 
             if room.enemigo_id != None and room.estado == 1:
                 self.menuRoom.esperaRoom(2)
+                time.sleep(2)
+                room.estado = 2
+                self.roomsdb.updateRoom(room)
 
             if room.enemigo_id != None and room.estado == 2:
                 self.menuRoom.esperaRoom(3)
+                break
             
             time.sleep(2)
+    
+    def joinRoom(self, room):
+        room.estado = 2
+        self.roomsdb.updateRoom(room)

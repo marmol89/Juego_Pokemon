@@ -47,5 +47,15 @@ class users:
         if len(data) > 1:
             userl = user(data[0], data[1], data[2])
             return userl
-
+    
+    def getUser(self, id):
+        mycursor = self.dbp.cursor()
+        sql = "SELECT * FROM users WHERE id=%s"
+        mycursor.execute(sql, (id ,))
+        data = mycursor.fetchone()
+        if data == None:
+            return None
+        if len(data) > 1:
+            userl = user(data[0], data[1], data[2])
+            return userl
         

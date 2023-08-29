@@ -1,6 +1,8 @@
+from src.database.users import users
+
 class room:
 
-    #Estados 1->Abirto, 2->Cerrado, 3->Finalizado,
+    #Estados 1->Abirto, 2->cargando, 3->Cerrado, 4->Finalizado,
 
     def __init__(self, id , user_id, enemigo_id, nombre, estado):
         self.id = id
@@ -24,3 +26,10 @@ class room:
     def estado(self):
         return self.estado
     
+    def getUser(self):
+        userdb = users()
+        return userdb.getUser(self.user_id)
+    
+    def getEnemigo(self):
+        userdb = users()
+        return userdb.getUser(self.enemigo_id)

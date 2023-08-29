@@ -93,7 +93,7 @@ class rooms:
     
     def updateRoom(self, room):
         mycursor = self.dbp.cursor()
-        sql = "UPDATE rooms SET user_id = %s, enemigo_id = %s, nombre = %s , estado = %s  WHERE id = %s"
+        sql = "UPDATE rooms SET user_id = %s, enemigo_id = %s, nombre = %s , estado = %s WHERE id = %s"
         val = (room.user_id, room.enemigo_id, room.nombre, room.estado, room.id)
         mycursor.execute(sql, val)
         self.dbp.commit()
