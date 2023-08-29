@@ -18,13 +18,25 @@ def borrarTablas():
         mycursor.execute(sql)
     mycursor.close()
 
+def borrarSalas():
+    mycursor = mydb.cursor()
+    sql = "DROP TABLE movements , battles , teams , rooms"
+    mycursor.execute(sql)
+    createTableBattle()
+    mycursor.close()
+
 def createTables():
     mycursor = mydb.cursor()
     mycursor.execute("CREATE TABLE pokemons (id int NOT NULL AUTO_INCREMENT ,nombre VARCHAR(255), tipos JSON, movimientos JSON, EVs JSON, puntos_de_salud int, PRIMARY KEY (id))")
     mycursor.execute("CREATE TABLE users (id int NOT NULL AUTO_INCREMENT ,username VARCHAR(255), password VARCHAR(600), PRIMARY KEY (id))")
-    mycursor.execute("CREATE TABLE rooms (id INT AUTO_INCREMENT PRIMARY KEY, user_id INT, enemigo_id INT, nombre VARCHAR(255), estado INT DEFAULT 0, FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (enemigo_id) REFERENCES users(id))")
     mycursor.close()
 
+def createTableBattle():
+    mycursor = mydb.cursor()
+    mycursor.execute("CREATE TABLE rooms (id INT AUTO_INCREMENT PRIMARY KEY, user_id INT, enemigo_id INT, nombre VARCHAR(255), estado INT DEFAULT 0, FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (enemigo_id) REFERENCES users(id))")
+    mycursor.execute("CREATE TABLE teams (id INT AUTO_INCREMENT PRIMARY KEY, room_id INT UNIQUE, pokemon_1_id INT, pokemon_2_id INT, pokemon_3_id INT, pokemon_4_id INT, pokemon_5_id INT, pokemon_6_id INT, pokemon_active_id INT, FOREIGN KEY (room_id) REFERENCES rooms(id), FOREIGN KEY (pokemon_1_id) REFERENCES pokemons(id), FOREIGN KEY (pokemon_2_id) REFERENCES pokemons(id), FOREIGN KEY (pokemon_3_id) REFERENCES pokemons(id), FOREIGN KEY (pokemon_4_id) REFERENCES pokemons(id), FOREIGN KEY (pokemon_5_id) REFERENCES pokemons(id), FOREIGN KEY (pokemon_6_id) REFERENCES pokemons(id), FOREIGN KEY (pokemon_active_id) REFERENCES pokemons(id))")
+    mycursor.execute("CREATE TABLE battles (id INT AUTO_INCREMENT PRIMARY KEY, room_id INT UNIQUE, winner_id INT NULL, loser_id INT NULL, user_team_id INT, enemy_team_id INT, FOREIGN KEY (room_id) REFERENCES rooms(id), FOREIGN KEY (winner_id) REFERENCES users(id), FOREIGN KEY (loser_id) REFERENCES users(id), FOREIGN KEY (user_team_id) REFERENCES teams(id), FOREIGN KEY (enemy_team_id) REFERENCES teams(id))")
+    mycursor.execute("CREATE TABLE movements (id INT AUTO_INCREMENT PRIMARY KEY, room_id INT, pokemon_id INT, nombre VARCHAR(255) NOT NULL, efecto VARCHAR(255) NOT NULL, FOREIGN KEY (room_id) REFERENCES rooms(id), FOREIGN KEY (pokemon_id) REFERENCES pokemons(id))")
 def insetarPokemons():
     mycursor = mydb.cursor()
     sql = "INSERT INTO pokemons (nombre, tipos, movimientos, EVs, puntos_de_salud) VALUES (%s, %s, %s, %s, %s)"
@@ -47,8 +59,20 @@ def insetarPokemons():
     mydb.commit()
 
 
-borrarTablas()
-createTables()
-insetarPokemons()
+print("Que quieres borrar ?")
+print("1 - Todo")
+print("2 - Salas")
+opcion = input("option: ")
+
+if opcion == "1":
+    borrarTablas()
+    createTables()
+    createTableBattle()
+    insetarPokemons()
+
+if opcion == "2":
+    borrarSalas()
+
+
 
 mydb.close()
