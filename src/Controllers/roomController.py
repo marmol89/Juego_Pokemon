@@ -1,9 +1,10 @@
 from src.database.rooms import rooms
 from src.menus.menuRoom import menuRoom
+from src.Controllers.teamController import teamController
 import time
 
 class roomController:
-
+    user = any
     def __init__(self):
         self.menuRoom = menuRoom()
         self.roomsdb = rooms()
@@ -22,6 +23,7 @@ class roomController:
 
             if room.enemigo_id != None and room.estado == 2:
                 self.menuRoom.esperaRoom(3)
+                teamController(room, self.user).inicio()
                 break
             
             time.sleep(2)

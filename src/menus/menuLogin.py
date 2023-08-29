@@ -39,6 +39,7 @@ class menuLogin:
         os.system('clear')
     
     def createRoom(self):
+        self.roomcr.user = self.user
         print("-----POKEMONE MENU-----")
         print("-----CREACION SALA-----")
         print("")
@@ -51,6 +52,7 @@ class menuLogin:
         os.system('clear')
     
     def joinRoom(self):
+        self.roomcr.user = self.user
         salas = self.roomsdb.getRoomActivos()
         if len(salas) == 0:
             while len(salas) == 0:
