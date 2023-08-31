@@ -1,5 +1,7 @@
 from src.database.db import db
 from src.models.room import room
+from src.models.battle import battle
+from src.models.team import team
 class rooms:
 
     def __init__(self):
@@ -78,6 +80,7 @@ class rooms:
         val = (user_id , name , 1)
         mycursor.execute(sql, val)
         self.dbp.commit()
+        print(mycursor.execute(sql, val))
     
     def getRoom(self, id):
         mycursor = self.dbp.cursor()

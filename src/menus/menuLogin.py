@@ -2,6 +2,7 @@ import os
 import time
 from src.database.rooms import rooms
 from src.Controllers.roomController import roomController
+from src.database.battles import battles
 
 class menuLogin:
 
@@ -10,6 +11,7 @@ class menuLogin:
     def __init__(self):
         self.roomsdb = rooms()
         self.roomcr = roomController()
+        self.battlesdb = battles()
         os.system('clear')
     
     def inicio(self):
@@ -45,10 +47,13 @@ class menuLogin:
         print("")
         name = input("Nombre Sala: ")
         self.roomsdb.createRoom(self.user.id, name)
+        # Crear la batalla
         os.system('clear')
         print("Sala creada")
         time.sleep(2)
-        self.roomcr.combrobarRoomEspera(self.roomsdb.getRoomUserActiva(self.user.id))
+        room = self.roomsdb.getRoomUserActiva(self.user.id)
+        self.battlesdb.createBattle(room.id)
+        self.roomcr.combrobarRoomEspera(room)
         os.system('clear')
     
     def joinRoom(self):

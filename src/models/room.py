@@ -1,5 +1,5 @@
 from src.database.users import users
-
+from src.Consultas.roomCS import roomCS
 class room:
 
     #Estados 1->Abirto, 2->cargando, 3->Cerrado, 4->Finalizado,
@@ -33,3 +33,15 @@ class room:
     def getEnemigo(self):
         userdb = users()
         return userdb.getUser(self.enemigo_id)
+    
+    def getBattle(self):
+        roomsdb = roomCS()
+        return roomsdb.getBattle(self.id)
+    
+    def getUserTeam(self):
+        roomsdb = roomCS()
+        return roomsdb.getUserTeam(self.id, self.user_id)
+    
+    def getEnemigoTeam(self):
+        roomsdb = roomCS()
+        return roomsdb.getUserTeam(self.id, self.enemigo_id)
