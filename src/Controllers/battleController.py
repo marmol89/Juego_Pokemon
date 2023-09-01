@@ -1,3 +1,4 @@
+import time
 class battleController:
     def __init__(self, room):
         self.room = room
@@ -6,4 +7,5 @@ class battleController:
         self.enemy = room.getEnemigo()
     
     def inicio(self):
-        print("inicio")
+        print("inicio battalla")
+        time.sleep(10)

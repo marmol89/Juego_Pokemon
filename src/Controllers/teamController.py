@@ -31,7 +31,16 @@ class teamController:
             battle.enemy_team_ids = [team.id for team in teamenemy]
             battlesdb.updateBattleEnemyTeam(battle)
         
-        battleController(self.room).inicio()
+        battle = self.room.getBattle()
+
+        while True:
+            battle = self.room.getBattle()
+            if(battle.enemy_team_ids != None and battle.user_team_ids != None):
+                    battleController(self.room).inicio()
+            
+            if(battle.winner_id != None and battle.loser_id != None):
+                break
+
 
 
 
