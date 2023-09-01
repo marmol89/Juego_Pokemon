@@ -5,7 +5,7 @@ import os
 class menuTeam:
     def __init__(self, room):
         self.room = room
-        os.system('clear')
+        os.system('cls')
     
     def selecionar(self, user):
         pokemons = pokemonDB().getPokemons()

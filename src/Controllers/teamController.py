@@ -1,6 +1,7 @@
 from src.menus.menuTeam import menuTeam
 from src.database.teams import teams
 from src.database.battles import battles
+from src.Controllers.battleController import battleController
 
 class teamController:
     user = any
@@ -23,12 +24,14 @@ class teamController:
         if (self.user.id == self.room.user_id):
             teamuser = self.room.getUserTeam()
             battle.user_team_ids = [team.id for team in teamuser]
+            battlesdb.updateBattleUserTeam(battle)
         
         if (self.user.id == self.room.enemigo_id):
             teamenemy = self.room.getEnemigoTeam()
             battle.enemy_team_ids = [team.id for team in teamenemy]
+            battlesdb.updateBattleEnemyTeam(battle)
         
-        battlesdb.updateBattle(battle)
+        battleController(self.room).inicio()
 
 
 

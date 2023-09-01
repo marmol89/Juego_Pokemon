@@ -12,10 +12,6 @@ class battle:
         self.user_team_ids = user_team_ids
         self.enemy_team_ids = enemy_team_ids
     
-    def getRoom(self):
-        roomdb = rooms()
-        return roomsdb.getRoom(self.room_id)
-    
     def userTeam(self):
         teamdb = teams()
         ids = json.loads(self.user_team_ids)

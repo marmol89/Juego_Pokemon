@@ -43,3 +43,17 @@ class battles:
         
         self.dbp.commit()
         return data
+    
+    def updateBattleUserTeam(self, battle):
+        mycursor = self.dbp.cursor()
+        sql = "UPDATE battles SET user_team_ids=%s WHERE room_id=%s"
+        val = (json.dumps(battle.user_team_ids), battle.room_id)
+        mycursor.execute(sql, val)
+        self.dbp.commit()
+    
+    def updateBattleEnemyTeam(self, battle):
+        mycursor = self.dbp.cursor()
+        sql = "UPDATE battles SET enemy_team_ids=%s WHERE room_id=%s"
+        val = (json.dumps(battle.enemy_team_ids), battle.room_id)
+        mycursor.execute(sql, val)
+        self.dbp.commit()

@@ -12,7 +12,7 @@ class menuLogin:
         self.roomsdb = rooms()
         self.roomcr = roomController()
         self.battlesdb = battles()
-        os.system('clear')
+        os.system('cls')
     
     def inicio(self):
         print("-----POKEMONE MENU-----")
@@ -26,19 +26,19 @@ class menuLogin:
         optionI = input("Option: ")
 
         if optionI == '0':
-            os.system('clear')
+            os.system('cls')
             self.logut()
 
         if optionI == '1':
-            os.system('clear')
+            os.system('cls')
             self.createRoom()
         if optionI == '2':
-            os.system('clear')
+            os.system('cls')
             self.joinRoom()
     
     def logut(self):
         self.user = any
-        os.system('clear')
+        os.system('cls')
     
     def createRoom(self):
         self.roomcr.user = self.user
@@ -48,13 +48,13 @@ class menuLogin:
         name = input("Nombre Sala: ")
         self.roomsdb.createRoom(self.user.id, name)
         # Crear la batalla
-        os.system('clear')
+        os.system('cls')
         print("Sala creada")
         time.sleep(2)
         room = self.roomsdb.getRoomUserActiva(self.user.id)
         self.battlesdb.createBattle(room.id)
         self.roomcr.combrobarRoomEspera(room)
-        os.system('clear')
+        os.system('cls')
     
     def joinRoom(self):
         self.roomcr.user = self.user
@@ -74,7 +74,7 @@ class menuLogin:
                 if option == "2":
                     break
                 salas = self.roomsdb.getRoomActivos()
-                os.system('clear')
+                os.system('cls')
         
         if len(salas) > 0:
             option = "0"
@@ -100,9 +100,9 @@ class menuLogin:
                     sala.enemigo_id = self.user.id
                     self.roomsdb.updateRoom(sala)
                     self.roomcr.combrobarRoomEspera(sala)
-                os.system('clear')
+                os.system('cls')
         
-        os.system('clear')
+        os.system('cls')
 
 
             

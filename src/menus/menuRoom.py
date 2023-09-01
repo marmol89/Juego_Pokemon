@@ -6,7 +6,7 @@ class menuRoom:
         self.roomsdb = rooms()
 
     def esperaRoom(self, tipo):
-        os.system('clear')
+        os.system('cls')
         if tipo == 1:
             print("-----POKEMONE SALA-----")
             print("-----ESPERA A QUE SE TE UNA EL RIVAL-----")
