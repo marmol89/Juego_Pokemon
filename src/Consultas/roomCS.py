@@ -19,6 +19,7 @@ class roomCS:
         return data
     
     def getUserTeam(self, room_id , user_id):
+        self.dbp.commit()
         mycursor = self.dbp.cursor()
         sql = "SELECT * FROM teams where room_id=%s AND user_id=%s"
         mycursor.execute(sql, (room_id, user_id))
@@ -28,4 +29,6 @@ class roomCS:
         if teams != None:
             for row in data:
                 teams.append(team(row[0], row[1], row[2], row[3], row[4], row[5], row[6]))
+        self.dbp.commit()
         return teams
+    

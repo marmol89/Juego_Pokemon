@@ -20,5 +20,6 @@ class menuTeam:
             option = input("Option: ")
             pokemon = pokemons[int(option) - 1]
             teams.append(Team(None, self.room.id, user.id, pokemon.id, 1 if len(teams) == 0 else 0,  pokemon.puntos_de_salud, None))
-        
+            os.system('cls')
+            print("Esperando al otro jugador...")
         return teams

@@ -1,11 +1,22 @@
 import time
+from src.menus.menuBattle import menuBattle
 class battleController:
-    def __init__(self, room):
+    def __init__(self, room, user):
         self.room = room
         self.battle = room.getBattle()
-        self.user = room.getUser()
-        self.enemy = room.getEnemigo()
+        self.user = user
+        self.updateTeams()
     
     def inicio(self):
-        print("inicio battalla")
-        time.sleep(10)
+        menuBattle(self.room).inicio(self.user, self.enemy)
+
+
+    def updateTeams(self):
+        if (self.user.id == self.room.user_id):
+            self.userTeam = self.room.getUserTeam()
+            self.enemyTeam = self.room.getEnemigoTeam()
+            self.enemy = self.room.getEnemigo()
+        if (self.user.id == self.room.enemigo_id):
+            self.userTeam = self.room.getEnemigoTeam()
+            self.enemyTeam = self.room.getUserTeam()
+            self.enemy = self.room.getUser()
