@@ -1,2 +1,2 @@
 # Juego Pokemon
-Juego de Pokemon echo con python
+Juego de Pokemon hecho con python
