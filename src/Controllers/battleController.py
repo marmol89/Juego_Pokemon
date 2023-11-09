@@ -9,6 +9,7 @@ class battleController:
     
     def inicio(self):
         menuBattle(self.room).inicio(self.user, self.enemy)
+        menuBattle(self.room).presentacionPokemon(self.user, self.enemy, self.userTeam, self.enemyTeam)
 
 
     def updateTeams(self):

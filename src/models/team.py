@@ -1,3 +1,4 @@
+from src.Consultas.teamCS import teamCS
 class team:
     def __init__(self, id, room_id, user_id, pokemon_id, active, vida, efecto):
         self.id = id
@@ -7,6 +8,9 @@ class team:
         self.active = active
         self.vida = vida
         self.efecto = efecto
+    
+    def pokemon(self):
+        return teamCS().getPokemon(self.pokemon_id)
     
 
     
