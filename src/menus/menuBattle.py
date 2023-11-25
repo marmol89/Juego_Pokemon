@@ -11,22 +11,41 @@ class menuBattle:
         print(user.username + " vs " + enemy.username)
         time.sleep(2)
 
-    def presentacionPokemon(self, user, enemy , userTeam, enemyTeam):
+    def presentacionPokemons(self, user, enemy, userTeam, enemyTeam):
         os.system('cls')
-        print("------------------------")
-        print(user.username + " vs " + enemy.username)
-        print("----"+user.username+"------Pokemon------ENEMIGO------")
-        print(userTeam[0].pokemon().nombre + " vs " + enemyTeam[0].pokemon().nombre)
-        print(userTeam[1].pokemon().nombre + " vs " + enemyTeam[1].pokemon().nombre)
+        print(f"═══{'-'*len(user.username)}───Pokemon───{'-'*len(enemy.username)}═══")
+        print(f" {user.username:^{len(user.username)+21}} vs {enemy.username:^{len(enemy.username)+21}} ")
+        print(f" {'':^{len(user.username)+21}} {'':^{len(enemy.username)+21}} ")
+        
+        for userPokemon, enemyPokemon in zip(userTeam, enemyTeam):
+            print(f" {userPokemon.pokemon().nombre:^{len(user.username)+21}} vs {enemyPokemon.pokemon().nombre:^{len(enemy.username)+21}} ")
+        
+        print(f"══{'-'*len(user.username)}───Pokemon───{'-'*len(enemy.username)}═══")
         time.sleep(5)
 
     def combate(self, user, enemy , userTeam, enemyTeam):
         os.system('cls')
-        print("------------------------")
-        time.sleep(5)
+        print(f"{'='*30} Pokémon {'='*30}")
+        print(f"{self.room.pokemonActivoUser().nombre:^30} {'vs':^10} {self.room.pokemonActivoEnemigo().nombre.nombre:^30}")
+        print(f"{'':^30} {'':^10} {'':^30}")
+        print(f"{userPokemon.nombre} - Nivel {userPokemon.nivel} {'':^10} {enemyPokemon.nombre} - Nivel 22")
+        print(f"HP: {userPokemon.hp}/{userPokemon.max_hp} {'':^10} HP: {enemyPokemon.hp}/{enemyPokemon.max_hp}")
+        print(f"[{'#' * (int(userPokemon.hp / userPokemon.max_hp * 10)):<10}] {'':^10} [{'#' * (int(enemyPokemon.hp / enemyPokemon.max_hp * 10)):<10}]")
+        print(f"{'='*30}{'='*10}{'='*30}")
+        time.sleep(2)
     
 
     def vida(self, user, enemy , userTeam, enemyTeam):
         os.system('cls')
         print("------------------------")
         time.sleep(5)
+    
+    def victoria(self, user, enemy , userTeam, enemyTeam):
+        os.system('cls')
+        print(f"¡{user.username} ha ganado la batalla!")
+        time.sleep(2)
+
+    def derrota(self, user, enemy , userTeam, enemyTeam):
+        os.system('cls')
+        print(f"{user.username} ha sido derrotado por {enemy.username}.")
+        time.sleep(2)

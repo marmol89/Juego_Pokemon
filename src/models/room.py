@@ -45,3 +45,19 @@ class room:
     def getEnemigoTeam(self):
         roomsdb = roomCS()
         return roomsdb.getUserTeam(self.id, self.enemigo_id)
+    
+    def isVidaTeamUser(self):
+        roomsdb = roomCS()
+        return roomsdb.isTodosConVida(self.id, self.user_id)
+    
+    def isVidaTeamEnemigo(self):
+        roomsdb = roomCS()
+        return roomsdb.isTodosConVida(self.id, self.enemigo_id)
+    
+    def pokemonActivoUser(self):
+        roomsdb = roomCS()
+        return roomsdb.pokemonActivo(self.id, self.user_id)
+    
+    def pokemonActivoEnemigo(self):
+        roomsdb = roomCS()
+        return roomsdb.pokemonActivo(self.id, self.enemigo_id)

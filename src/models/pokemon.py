@@ -28,4 +28,6 @@ class pokemon:
         return self.velocidad
     
     def puntos_de_salud(self):
+        if self.puntos_de_salud <= 0:
+            self.puntos_de_salud = 0
         return self.puntos_de_salud

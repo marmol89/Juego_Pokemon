@@ -1,7 +1,5 @@
 from src.database.db import db
 from src.models.room import room
-from src.models.battle import battle
-from src.models.team import team
 class rooms:
 
     def __init__(self):

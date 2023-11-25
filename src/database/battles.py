@@ -1,5 +1,6 @@
 from src.database.db import db
 from src.models.user import user
+from src.models.pokemon import pokemon
 import json
 class battles:
     def __init__(self):
@@ -57,3 +58,4 @@ class battles:
         val = (json.dumps(battle.enemy_team_ids), battle.room_id)
         mycursor.execute(sql, val)
         self.dbp.commit()
+        
