@@ -1,15 +1,17 @@
 import mysql.connector
-
+import os
+from dotenv import load_dotenv
+load_dotenv()
 class db:
 
     mydb = any
 
     def __init__(self):
         self.mydb = mysql.connector.connect(
-            host="localhost",
-            user="root",
-            password="root",
-            database="Juego_Pokemon"
+                    host=os.getenv('HOST_MYSQL'),
+                    user=os.getenv('USER_MYSQL'),
+                    password=os.getenv('PASS_MYSQL'),
+                    database=os.getenv('DATABASE_MYSQL')
             )
         
     def mydb(self):

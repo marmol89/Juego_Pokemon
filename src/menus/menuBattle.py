@@ -1,5 +1,6 @@
 import os
 import time
+import json
 
 class menuBattle:
     def __init__(self , room):
@@ -21,12 +22,14 @@ class menuBattle:
             print(f" {userPokemon.pokemon().nombre:^{len(user.username)+21}} vs {enemyPokemon.pokemon().nombre:^{len(enemy.username)+21}} ")
         
         print(f"══{'-'*len(user.username)}───Pokemon───{'-'*len(enemy.username)}═══")
-        time.sleep(5)
+        time.sleep(2)
 
     def combate(self, user, enemy , userTeam, enemyTeam):
         os.system('cls')
+        userPokemon = self.room.pokemonActivoUser()
+        enemyPokemon = self.room.pokemonActivoEnemigo()
         print(f"{'='*30} Pokémon {'='*30}")
-        print(f"{self.room.pokemonActivoUser().nombre:^30} {'vs':^10} {self.room.pokemonActivoEnemigo().nombre.nombre:^30}")
+        print(f"{userPokemon.nombre:^30} {'vs':^10} {enemyPokemon.nombre:^30}")
         print(f"{'':^30} {'':^10} {'':^30}")
         print(f"{userPokemon.nombre} - Nivel {userPokemon.nivel} {'':^10} {enemyPokemon.nombre} - Nivel 22")
         print(f"HP: {userPokemon.hp}/{userPokemon.max_hp} {'':^10} HP: {enemyPokemon.hp}/{enemyPokemon.max_hp}")
