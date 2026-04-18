@@ -15,10 +15,15 @@ class menuLogin:
         os.system('cls')
     
     def inicio(self):
+        # Recargar el usuario para tener los puntos al día
+        from src.database.users import users
+        self.user = users().getUser(self.user.id)
+
         print(f"{'='*50}")
         print(f"{'MENÚ PRINCIPAL':^50}")
         print(f"{'='*50}")
-        print(f"{'¡Bienvenido, ' + self.user.username.upper() + '!':^50}\n")
+        print(f"{'¡Bienvenido, ' + self.user.username.upper() + '!':^50}")
+        print(f"{'Puntos de Ranking: ' + str(self.user.puntos):^50}\n")
         print("  Opciones:")
         print("    [1] Crear Sala")
         print("    [2] Unirte a una Sala")

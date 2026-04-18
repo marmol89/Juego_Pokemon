@@ -23,7 +23,7 @@ class users:
 
     def createUser(self, username, password):
         if not self.dbp: return False
-        val = {"username": username, "password": self.cifrar_contrasena(password)}
+        val = {"username": username, "password": self.cifrar_contrasena(password), "puntos": 0}
         self.dbp.table("users").insert(val).execute()
         return True
     
@@ -35,7 +35,7 @@ class users:
         user_row = data.data[0]
         if not self.verificar_contrasena(password, user_row['password']):
             return None
-        return user(user_row['id'], user_row['username'], user_row['password'])
+        return user(user_row['id'], user_row['username'], user_row['password'], user_row.get('puntos', 0))
     
     def getUser(self, id):
         if not self.dbp: return None
@@ -43,4 +43,8 @@ class users:
         if len(data.data) == 0:
             return None
         user_row = data.data[0]
-        return user(user_row['id'], user_row['username'], user_row['password'])
+        return user(user_row['id'], user_row['username'], user_row['password'], user_row.get('puntos', 0))
+
+    def updatePuntos(self, user_id, nuevos_puntos):
+        if not self.dbp: return
+        self.dbp.table("users").update({"puntos": nuevos_puntos}).eq("id", user_id).execute()

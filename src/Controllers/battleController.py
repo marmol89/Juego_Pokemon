@@ -102,14 +102,37 @@ class battleController:
 
         if activeUserTeam.vida <= 0:
             menuBattle(self.room).derrota(self.user, self.enemy, self.userTeam, self.enemyTeam)
-            self.cleanUp()
+            self.cleanUp(ganador=False)
         elif activeEnemyTeam.vida <= 0:
             menuBattle(self.room).victoria(self.user, self.enemy, self.userTeam, self.enemyTeam)
-            self.cleanUp()
+            self.cleanUp(ganador=True)
 
-    def cleanUp(self):
+    def cleanUp(self, ganador=False):
+        from src.database.users import users
+        userdb = users()
+        
+        puntos_actuales = self.user.puntos
+        puntos_finales = puntos_actuales
+        res_puntos = 0
+
+        if ganador:
+            pokemon_vivos = len([t for t in self.userTeam if t.vida > 0])
+            res_puntos = 20 + (pokemon_vivos * 5)
+            print(f"\n  ¡HAS GANADO! +{res_puntos} puntos de ranking.")
+        else:
+            pokemon_derrotados_enemigo = len([t for t in self.enemyTeam if t.vida <= 0])
+            res_puntos = -10
+            if pokemon_derrotados_enemigo == 0:
+                res_puntos -= 5 # Penalización por no matar ninguno
+            print(f"\n  HAS PERDIDO. {res_puntos} puntos de ranking.")
+
+        puntos_finales += res_puntos
+        userdb.updatePuntos(self.user.id, puntos_finales)
+
+        print(f"  Puntuación total: {puntos_finales} puntos.")
         print("\nBatalla terminada. Volviendo al menú en 5 segundos...")
         time.sleep(5)
+        
         if self.room.user_id == self.user.id:
             from src.database.rooms import rooms
             roomsdb = rooms()
