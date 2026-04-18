@@ -9,32 +9,83 @@ class menuTeam:
     
     def selecionar(self, user):
         import time
-        pokemons = pokemonDB().getPokemons()
+        from src.utils.visuals import type_text
+        all_pokemons = pokemonDB().getPokemons()
         teams = []
-        while len(teams) == 0 or (len(teams) > 0 and len(teams) < 2):
-            print(f"{'='*50}")
-            print(f"{'SELECCIONA TUS POKÉMON':^50}")
-            print(f"{'='*50}\n")
-            
-            for i in range(0, len(pokemons), 2):
-                p1 = f"[{i+1}] {pokemons[i].nombre.upper()}"
-                if i+1 < len(pokemons):
-                    p2 = f"[{i+2}] {pokemons[i+1].nombre.upper()}"
-                    print(f"  {p1:<20} {p2}")
-                else:
-                    print(f"  {p1}")
-                    
-            print(f"\n{'='*50}")
-            option = input(f"  Elige a tu compañero ({len(teams)+1}/2): ")
-            try:
-                pokemon = pokemons[int(option) - 1]
-                teams.append(Team(None, self.room.id, user.id, pokemon.id, 1 if len(teams) == 0 else 0,  pokemon.puntos_de_salud, None))
-                os.system('cls')
-                print(f"\n  [+] Has seleccionado a {pokemon.nombre.upper()}!")
-                time.sleep(1)
-            except:
-                pass
+        
+        page = 0
+        page_size = 15
+        search_query = ""
+        
+        while len(teams) < 2:
             os.system('cls')
+            # Filtrar pokémons si hay búsqueda
+            filtered = [p for p in all_pokemons if search_query.lower() in p.nombre.lower()]
             
+            total_pages = (len(filtered) - 1) // page_size + 1 if filtered else 1
+            if page >= total_pages: page = total_pages - 1
+            if page < 0: page = 0
+            
+            start_idx = page * page_size
+            end_idx = start_idx + page_size
+            current_page_pokes = filtered[start_idx:end_idx]
+            
+            print(f"{'='*70}")
+            header = f"SELECCIONA TU EQUIPO ({len(teams)+1}/2)"
+            if search_query:
+                header += f" - Buscando: '{search_query}'"
+            print(f"{header:^70}")
+            print(f"{'Página ' + str(page+1) + '/' + str(total_pages):^70}")
+            print(f"{'='*70}\n")
+            
+            # Mostrar en 3 columnas
+            for i in range(0, len(current_page_pokes), 3):
+                row = ""
+                for j in range(3):
+                    if i + j < len(current_page_pokes):
+                        p = current_page_pokes[i+j]
+                        # El ID original en la lista filtrada puede ser engañoso, usamos el del objeto
+                        item_str = f"[{p.id}] {p.nombre.upper()}"
+                        row += f"  {item_str:<22}"
+                print(row)
+            
+            print(f"\n{'='*70}")
+            print("  [ID] Seleccionar  [N] Siguiente  [P] Anterior  [S] Buscar  [C] Limpiar")
+            print(f"{'='*70}")
+            
+            opcion = input("\n  Acción: ").strip().lower()
+            
+            if opcion == 'n':
+                if page < total_pages - 1: page += 1
+            elif opcion == 'p':
+                if page > 0: page -= 1
+            elif opcion == 's':
+                search_query = input("  Introduce nombre a buscar: ").strip()
+                page = 0
+            elif opcion == 'c':
+                search_query = ""
+                page = 0
+            else:
+                try:
+                    poke_id = int(opcion)
+                    # Buscar el pokemon por ID en la lista completa
+                    pokemon = next((p for p in all_pokemons if p.id == poke_id), None)
+                    
+                    if pokemon:
+                        # Verificar si ya está en el equipo
+                        if any(t.pokemon_id == pokemon.id for t in teams):
+                            print("  [!] Ya has seleccionado a este Pokémon.")
+                            time.sleep(1)
+                            continue
+                            
+                        teams.append(Team(None, self.room.id, user.id, pokemon.id, 1 if len(teams) == 0 else 0,  pokemon.puntos_de_salud, None))
+                        print(f"\n  [+] ¡{pokemon.nombre.upper()} se ha unido a tu equipo!")
+                        time.sleep(1)
+                    else:
+                        print("  [!] ID de Pokémon no válido.")
+                        time.sleep(1)
+                except ValueError:
+                    pass
+
         print("\n  Esperando al otro jugador...")
         return teams
