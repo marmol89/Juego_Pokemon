@@ -12,3 +12,8 @@ class teamCS:
         if len(data.data) == 0: return None
         row = data.data[0]
         return pokemon(int(row['id']), row['nombre'], row['tipos'], row['movimientos'], row['EVs'], int(row['puntos_de_salud']))
+
+    def updateVida(self, team_id, nueva_vida):
+        if not self.dbp: return False
+        res = self.dbp.table("teams").update({"vida": nueva_vida}).eq("id", team_id).execute()
+        return len(res.data) > 0

@@ -59,3 +59,7 @@ class rooms:
             "estado": r.estado
         }
         self.dbp.table("rooms").update(val).eq("id", r.id).execute()
+        
+    def deleteRoom(self, id):
+        if not self.dbp: return None
+        self.dbp.table("rooms").delete().eq("id", id).execute()

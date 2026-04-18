@@ -28,14 +28,33 @@ class menuBattle:
         os.system('cls')
         userPokemon = self.room.pokemonActivoUser()
         enemyPokemon = self.room.pokemonActivoEnemigo()
+        activeUserTeam = next((t for t in userTeam if t.active), userTeam[0])
+        activeEnemyTeam = next((t for t in enemyTeam if t.active), enemyTeam[0])
+        userVida = max(0, activeUserTeam.vida)
+        enemyVida = max(0, activeEnemyTeam.vida)
+        
         print(f"{'='*30} Pokémon {'='*30}")
         print(f"{userPokemon.nombre:^30} {'vs':^10} {enemyPokemon.nombre:^30}")
         print(f"{'':^30} {'':^10} {'':^30}")
-        print(f"{userPokemon.nombre} - Nivel {userPokemon.nivel} {'':^10} {enemyPokemon.nombre} - Nivel 22")
-        print(f"HP: {userPokemon.hp}/{userPokemon.max_hp} {'':^10} HP: {enemyPokemon.hp}/{enemyPokemon.max_hp}")
-        print(f"[{'#' * (int(userPokemon.hp / userPokemon.max_hp * 10)):<10}] {'':^10} [{'#' * (int(enemyPokemon.hp / enemyPokemon.max_hp * 10)):<10}]")
+        print(f"HP: {userVida}/{userPokemon.puntos_de_salud} {'':^10} HP: {enemyVida}/{enemyPokemon.puntos_de_salud}")
+        print(f"[{'#' * (int(userVida / userPokemon.puntos_de_salud * 10)):<10}] {'':^10} [{'#' * (int(enemyVida / enemyPokemon.puntos_de_salud * 10)):<10}]")
         print(f"{'='*30}{'='*10}{'='*30}")
-        time.sleep(2)
+        
+        print("\n¿Qué movimiento quieres usar?")
+        movimientos = userPokemon.movimientos
+        if isinstance(movimientos, str):
+            movimientos = json.loads(movimientos)
+            
+        for i, mov in enumerate(movimientos):
+            print(f"{i+1} - {mov['nombre']} (Poder: {mov['poder']} | Tipo: {mov['tipo']})")
+        
+        while True:
+            try:
+                opcion = int(input("Option: "))
+                if 1 <= opcion <= len(movimientos):
+                    return movimientos[opcion - 1]
+            except:
+                pass
     
 
     def vida(self, user, enemy , userTeam, enemyTeam):

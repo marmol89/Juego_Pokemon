@@ -29,7 +29,10 @@ class roomCS:
 
     def pokemonActivo(self, room_id, user_id):
         if not self.dbp: return False
-        data = self.dbp.table("teams").select("pokemons(*)").eq("room_id", room_id).eq("user_id", user_id).eq("active", True).execute()
-        if not data.data or not data.data[0].get('pokemons'): return False
-        row = data.data[0]['pokemons']
+        data = self.dbp.table("teams").select("*").eq("room_id", room_id).eq("user_id", user_id).eq("active", True).execute()
+        if not data.data: return False
+        pokemon_id = data.data[0]['pokemon_id']
+        pokemon_data = self.dbp.table("pokemons").select("*").eq("id", pokemon_id).execute()
+        if not pokemon_data.data: return False
+        row = pokemon_data.data[0]
         return pokemon(int(row['id']), row['nombre'], row['tipos'], row['movimientos'], row['EVs'], int(row['puntos_de_salud']))
