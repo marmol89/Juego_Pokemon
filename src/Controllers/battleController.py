@@ -40,6 +40,17 @@ class battleController:
             
             move = menuBattle(self.room).combate(self.user, self.enemy, self.userTeam, self.enemyTeam, self.items_used)
             
+            # Detectar si el menú vio que el oponente se rindió
+            if move.get("tipo_accion") == "opponent_surrender":
+                type_text("\n¡EL RIVAL SE HA RENDIDO!")
+                activeEnemyTeam.vida = 0
+                break
+
+            # Rendición inmediata propia
+            if move.get("tipo_accion") == "surrender":
+                movCS.insertMovement(self.room.id, userPokemon.id, "Rendición", json.dumps(move))
+                break # El bucle principal termina, irá a cleanUp con hp actual (que será >0 pero forzaremos derrota)
+
             # Si eligió mochila
             if move.get("tipo_accion") == "item":
                 chosen_item = menuBattle(self.room).mochila(self.user.id, self.items_used)
@@ -63,6 +74,14 @@ class battleController:
                 time.sleep(1)
                 
             opponentMove = json.loads(opponentMoveRow['efecto'])
+            
+            # --- DETECTAR RENDICIÓN DEL OPONENTE ---
+            if opponentMove.get("tipo_accion") == "surrender":
+                type_text("\n¡EL RIVAL SE HA RENDIDO!")
+                # Forzamos victoria rompiendo el bucle con la vida del enemigo en 0 ficticio
+                activeEnemyTeam.vida = 0
+                break
+
             
             # --- RESOLUCIÓN DE TURNO CON OBJETOS ---
             # Para simplificar, los objetos siempre se usan AL PRINCIPIO del turno antes que cualquier ataque.
@@ -139,6 +158,8 @@ class battleController:
                 if not userAlives:
                     break
                 new_active = menuBattle(self.room).cambiarPokemon(self.userTeam)
+                if new_active is None:
+                    break
                 teamdb.changeActive(activeUserTeam.id, new_active.id)
                 time.sleep(2)
             
@@ -154,7 +175,11 @@ class battleController:
                         break
                     time.sleep(1.5)
 
-        if activeUserTeam.vida <= 0:
+        # Si el bucle terminó por rendición propia, move tiene tipo_accion: surrender
+        if move.get("tipo_accion") == "surrender":
+            menuBattle(self.room).derrota(self.user, self.enemy, self.userTeam, self.enemyTeam)
+            self.cleanUp(ganador=False)
+        elif activeUserTeam.vida <= 0:
             menuBattle(self.room).derrota(self.user, self.enemy, self.userTeam, self.enemyTeam)
             self.cleanUp(ganador=False)
         elif activeEnemyTeam.vida <= 0:

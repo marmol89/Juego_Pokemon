@@ -64,11 +64,30 @@ class menuBattle:
             print(f"   [5] MOCHILA {status_mochila} [LÍMITE ALCANZADO]")
         else:
             print(f"   [5] MOCHILA {status_mochila}")
+        print("   [6] RENDIRSE")
         
         print()
-        from src.utils.visuals import get_key
+        from src.utils.visuals import get_key_timeout
+        from src.Consultas.movementCS import movementCS
+        movCS = movementCS()
+        
         while True:
-            opcion_str = get_key()
+            # --- POLLING PARA RENDICIÓN DEL RIVAL ---
+            opp_poke = self.room.getTheirActivePokemon(user.id)
+            if opp_poke:
+                opp_move_row = movCS.getMovement(self.room.id, opp_poke.id)
+                if opp_move_row:
+                    try:
+                        opp_move = json.loads(opp_move_row['efecto'])
+                        if opp_move.get("tipo_accion") == "surrender":
+                            return {"tipo_accion": "opponent_surrender"} # Señal para el controlador
+                    except:
+                        pass
+
+            opcion_str = get_key_timeout(timeout=0.5)
+            if opcion_str is None:
+                continue
+
             try:
                 opcion = int(opcion_str)
                 if 1 <= opcion <= len(movimientos):
@@ -79,6 +98,17 @@ class menuBattle:
                         time.sleep(1.5)
                         return self.combate(user, enemy, userTeam, enemyTeam, items_used)
                     return {"tipo_accion": "item"}
+                if opcion == 6:
+                    print("\n  ¿Estás REALMENTE SEGURO de que quieres rendirte? [S/N]")
+                    confirm = None
+                    while confirm not in ['s', 'n']:
+                        confirm = get_key_timeout(timeout=0.5)
+                    if confirm == 's':
+                        return {"tipo_accion": "surrender", "nombre": "Rendición"}
+                    else:
+                        print("  [!] Sabia decisión. ¡Sigue luchando!")
+                        time.sleep(1.5)
+                        return self.combate(user, enemy, userTeam, enemyTeam, items_used)
             except:
                 pass
     
@@ -114,7 +144,23 @@ class menuBattle:
                 print(f"   [{i+1}] {pokemon.nombre:<15} (HP: {t.vida}/{pokemon.puntos_de_salud})")
                 
             print(f"\n{'='*70}")
-            opcion_str = get_key()
+            opcion_str = get_key_timeout(timeout=0.5)
+            if opcion_str is None:
+                # Polling para rendición del rival mientras eliges cambio
+                from src.Consultas.movementCS import movementCS
+                movCS = movementCS()
+                opp_poke = self.room.getTheirActivePokemon(self.room.user_id if vivos[0].user_id != self.room.user_id else self.room.enemigo_id)
+                # Nota: room.user_id es el id del creador, no necesariamente el local.
+                # Pero en menuBattle.py, user_id se maneja via self.room.
+                
+                # Simplificación: usar self.room.getBattle() para ver si terminó
+                battle = self.room.getBattle()
+                # Si el oponente se rindió, cleanUp lo manejará, pero aquí podemos salir
+                if battle and battle.get('vencedor_id'):
+                     return None # Salir del menú
+
+                continue
+
             try:
                 opcion = int(opcion_str)
                 if 1 <= opcion <= len(vivos):
@@ -145,7 +191,14 @@ class menuBattle:
             print(f"\n   [0] VOLVER")
             print(f"\n{'='*70}")
             
-            opcion_str = get_key()
+            opcion_str = get_key_timeout(timeout=0.5)
+            if opcion_str is None:
+                # Check for surrender
+                battle = self.room.getBattle()
+                if battle and battle.get('vencedor_id'):
+                    return None
+                continue
+
             try:
                 choice = int(opcion_str)
                 if choice == 0:

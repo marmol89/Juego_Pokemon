@@ -45,32 +45,43 @@ def shake_screen(intensity=2, duration=0.5):
         sys.stdout.flush()
         time.sleep(0.05)
 
-def get_key():
-    """Detecta la pulsación de una tecla sin necesidad de Enter (Multiplataforma)."""
+def get_key_timeout(timeout=0.1):
+    """Detecta la pulsación de una tecla con un tiempo de espera (timeout)."""
     try:
-        # Windows
         import msvcrt
-        char = msvcrt.getch()
-        if char in [b'\x00', b'\xe0']: # Teclas especiales
-            msvcrt.getch()
-            return None
-        try:
-            return char.decode('utf-8').lower()
-        except:
-            return char
+        start_time = time.time()
+        while time.time() - start_time < timeout:
+            if msvcrt.kbhit():
+                char = msvcrt.getch()
+                if char in [b'\x00', b'\xe0']:
+                    msvcrt.getch()
+                    return None
+                try:
+                    return char.decode('utf-8').lower()
+                except:
+                    return char
+            time.sleep(0.01)
+        return None
     except ImportError:
-        # Linux/Mac
+        # Linux/Mac semi-non-blocking es más complejo, usaremos select o dejamos similar
         try:
-            import termios
-            import tty
+            import termios, tty, select
             fd = sys.stdin.fileno()
             old_settings = termios.tcgetattr(fd)
             try:
-                tty.setraw(sys.stdin.fileno())
-                ch = sys.stdin.read(1)
+                tty.setraw(fd)
+                rlist, _, _ = select.select([sys.stdin], [], [], timeout)
+                if rlist:
+                    return sys.stdin.read(1).lower()
+                return None
             finally:
                 termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-            return ch.lower()
         except:
-            # Fallback último
-            return sys.stdin.read(1).lower()
+            return None
+
+def get_key():
+    """Wrapper para mantener compatibilidad, bloquea hasta pulsar tecla."""
+    res = None
+    while res is None:
+        res = get_key_timeout(timeout=0.5)
+    return res
