@@ -29,23 +29,48 @@ def animate_hp_bar(old_hp, new_hp, max_hp, prefix="", width=20):
             current = new_hp
             
         bar = get_hp_bar_string(current, max_hp, width)
-        # Usamos \r para sobreescribir la misma línea
         sys.stdout.write(f"\r{prefix}{bar}")
         sys.stdout.flush()
         time.sleep(0.02)
     print()
 
 def shake_screen(intensity=2, duration=0.5):
-    """Simula una sacudida moviendo el cursor o añadiendo espacios."""
+    """Efecto de parpadeo para simular impacto."""
     end_time = time.time() + duration
     while time.time() < end_time:
-        # Nota: Este efecto es sutil en terminales estándar
-        # Una forma es imprimir el frame actual con un margen variable
-        # pero como no tenemos control de búfer completo, es difícil.
-        # Haremos un parpadeo rápido como alternativa.
         sys.stdout.write("\033[?25l") # Esconder cursor
         sys.stdout.flush()
         time.sleep(0.05)
         sys.stdout.write("\033[?25h") # Mostrar cursor
         sys.stdout.flush()
         time.sleep(0.05)
+
+def get_key():
+    """Detecta la pulsación de una tecla sin necesidad de Enter (Multiplataforma)."""
+    try:
+        # Windows
+        import msvcrt
+        char = msvcrt.getch()
+        if char in [b'\x00', b'\xe0']: # Teclas especiales
+            msvcrt.getch()
+            return None
+        try:
+            return char.decode('utf-8').lower()
+        except:
+            return char
+    except ImportError:
+        # Linux/Mac
+        try:
+            import termios
+            import tty
+            fd = sys.stdin.fileno()
+            old_settings = termios.tcgetattr(fd)
+            try:
+                tty.setraw(sys.stdin.fileno())
+                ch = sys.stdin.read(1)
+            finally:
+                termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+            return ch.lower()
+        except:
+            # Fallback último
+            return sys.stdin.read(1).lower()

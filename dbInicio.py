@@ -42,7 +42,8 @@ print("  [2] Limpiar Salas (Borrar partidas activas)")
 print("  [0] Salir")
 print("="*50)
 
-opcion = input("  Elige una opción: ")
+from src.utils.visuals import get_key
+opcion = get_key()
 
 if opcion == "1":
     borrarTablas()
@@ -51,9 +52,8 @@ if opcion == "1":
     # Importar y ejecutar seeders
     try:
         from src.scripts.seed_pokemons import main as seed_pokemons
-        from src.scripts.seed_items import seed_items
-        
         seed_pokemons()
+        from src.scripts.seed_items import seed_items
         seed_items()
         print("\n✅ ¡Inicialización completa!")
     except Exception as e:

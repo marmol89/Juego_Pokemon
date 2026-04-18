@@ -17,8 +17,9 @@ class menu:
         print("    [1] Iniciar Sesión")
         print("    [2] Registrarse")
         print("    [0] Salir\n")
+        from src.utils.visuals import get_key
         print(f"{'='*50}")
-        option = input("  Elige una opción: ")
+        option = get_key()
         
         if option == '1':
             os.system('cls')

@@ -38,11 +38,11 @@ class menuShop:
                     print(f"    - {inv['item'].nombre} x{inv['cantidad']}")
             
             print(f"\n{'='*70}")
-            print("  [ID] Comprar objeto")
-            print("  [0] Salir")
+            print("  [ID] Comprar objeto  [0] Salir")
             print(f"{'='*70}")
             
-            choice = input("  Elige una opción: ")
+            from src.utils.visuals import get_key
+            choice = get_key()
             
             if choice == "0":
                 break
@@ -50,10 +50,9 @@ class menuShop:
             selected = next((i for i in catalog if str(i.id) == choice), None)
             if selected:
                 if self.itemsdb.buyItem(self.user, selected):
-                    print(f"\n  [+] ¡Has comprado {selected.nombre}!")
+                    print(f"\n  [+] ¡Has comprado {selected.nombre.upper()}!")
                 else:
                     print("\n  [!] No tienes suficientes puntos.")
                 time.sleep(1.5)
             else:
-                print("\n  [!] Opción no válida.")
-                time.sleep(1)
+                pass

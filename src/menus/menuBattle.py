@@ -66,14 +66,16 @@ class menuBattle:
             print(f"   [5] MOCHILA {status_mochila}")
         
         print()
+        from src.utils.visuals import get_key
         while True:
+            opcion_str = get_key()
             try:
-                opcion = int(input("  Elige una opción: "))
+                opcion = int(opcion_str)
                 if 1 <= opcion <= len(movimientos):
                     return movimientos[opcion - 1]
                 if opcion == 5:
                     if items_used >= 5:
-                        print("  [!] Ya has usado el máximo de 5 objetos en esta batalla.")
+                        print("\n  [!] Ya has usado el máximo de 5 objetos en esta batalla.")
                         time.sleep(1.5)
                         return self.combate(user, enemy, userTeam, enemyTeam, items_used)
                     return {"tipo_accion": "item"}
@@ -97,6 +99,7 @@ class menuBattle:
         time.sleep(2)
 
     def cambiarPokemon(self, teamList):
+        from src.utils.visuals import get_key
         vivos = [t for t in teamList if t.vida > 0]
         if not vivos: return None
         
@@ -111,8 +114,9 @@ class menuBattle:
                 print(f"   [{i+1}] {pokemon.nombre:<15} (HP: {t.vida}/{pokemon.puntos_de_salud})")
                 
             print(f"\n{'='*70}")
+            opcion_str = get_key()
             try:
-                opcion = int(input("   Elige una opción: "))
+                opcion = int(opcion_str)
                 if 1 <= opcion <= len(vivos):
                     return vivos[opcion - 1]
             except:
@@ -120,6 +124,7 @@ class menuBattle:
 
     def mochila(self, user_id, items_used=0):
         from src.database.items import items
+        from src.utils.visuals import get_key
         inventory = items().getUserItems(user_id)
         
         while True:
@@ -140,8 +145,9 @@ class menuBattle:
             print(f"\n   [0] VOLVER")
             print(f"\n{'='*70}")
             
+            opcion_str = get_key()
             try:
-                choice = int(input("   Elige un objeto: "))
+                choice = int(opcion_str)
                 if choice == 0:
                     return None
                 if 1 <= choice <= len(inventory):

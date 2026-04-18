@@ -9,7 +9,7 @@ class menuTeam:
     
     def selecionar(self, user):
         import time
-        from src.utils.visuals import type_text
+        from src.utils.visuals import type_text, get_key
         all_pokemons = pokemonDB().getPokemons()
         teams = []
         
@@ -44,47 +44,39 @@ class menuTeam:
                 for j in range(3):
                     if i + j < len(current_page_pokes):
                         p = current_page_pokes[i+j]
-                        # El ID original en la lista filtrada puede ser engañoso, usamos el del objeto
                         item_str = f"[{p.id}] {p.nombre.upper()}"
                         row += f"  {item_str:<22}"
                 print(row)
             
             print(f"\n{'='*70}")
-            print("  [ID] Seleccionar  [N] Siguiente  [P] Anterior  [S] Buscar  [C] Limpiar")
+            print("  [N] Siguiente  [P] Anterior  [S] Buscar  [C] Limpiar  [Enter] Elegir ID")
             print(f"{'='*70}")
             
-            opcion = input("\n  Acción: ").strip().lower()
+            opcion = get_key()
             
             if opcion == 'n':
                 if page < total_pages - 1: page += 1
             elif opcion == 'p':
                 if page > 0: page -= 1
             elif opcion == 's':
-                search_query = input("  Introduce nombre a buscar: ").strip()
+                search_query = input("\n  Nombre a buscar: ").strip()
                 page = 0
             elif opcion == 'c':
                 search_query = ""
                 page = 0
-            else:
+            elif opcion in ['\r', '\n', ' ']:
                 try:
-                    poke_id = int(opcion)
-                    # Buscar el pokemon por ID en la lista completa
+                    poke_id = int(input("\n  ID del Pokémon: ").strip())
                     pokemon = next((p for p in all_pokemons if p.id == poke_id), None)
-                    
                     if pokemon:
-                        # Verificar si ya está en el equipo
                         if any(t.pokemon_id == pokemon.id for t in teams):
                             print("  [!] Ya has seleccionado a este Pokémon.")
                             time.sleep(1)
                             continue
-                            
                         teams.append(Team(None, self.room.id, user.id, pokemon.id, 1 if len(teams) == 0 else 0,  pokemon.puntos_de_salud, None))
                         print(f"\n  [+] ¡{pokemon.nombre.upper()} se ha unido a tu equipo!")
                         time.sleep(1)
-                    else:
-                        print("  [!] ID de Pokémon no válido.")
-                        time.sleep(1)
-                except ValueError:
+                except:
                     pass
 
         print("\n  Esperando al otro jugador...")
