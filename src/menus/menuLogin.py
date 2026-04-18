@@ -60,7 +60,15 @@ class menuLogin:
         print(f"{'='*50}")
         print(f"{'CREAR SALA':^50}")
         print(f"{'='*50}\n")
-        name = input("  Nombre de la Sala: ")
+        while True:
+            name = input("  Nombre de la Sala (VACÍO para volver): ").strip()
+            if not name:
+                os.system('cls')
+                return
+            if len(name) > 20:
+                print("  [!] El nombre es demasiado largo (máx 20 caracteres)")
+                continue
+            break
         self.roomsdb.createRoom(self.user.id, name)
         # Crear la batalla
         os.system('cls')
