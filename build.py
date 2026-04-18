@@ -12,9 +12,11 @@ def build():
     # Archivo principal
     main_script = "app.py"
     
-    # Separador para --add-data es diferente en Windows (;) y Linux/Mac (:)
-    sep = ";" if platform.system() == "Windows" else ":"
-    
+    # Icono basado en plataforma
+    icon_file = "icon.ico" if platform.system() == "Windows" else "icon.icns"
+    if not os.path.exists(icon_file):
+        icon_file = "icon.png" # Fallback a png si no hay conversor
+        
     # Comando base de PyInstaller
     cmd = [
         sys.executable,
@@ -26,6 +28,10 @@ def build():
         "--clean",
         main_script
     ]
+    
+    # Añadir icono si existe
+    if os.path.exists(icon_file):
+        cmd.append(f"--icon={icon_file}")
     
     # En Windows, PyInstaller suele necesitar extension .exe (se añade sola)
     # No ocultamos la consola (--noconsole) porque el juego es de terminal
