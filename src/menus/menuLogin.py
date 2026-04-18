@@ -71,49 +71,51 @@ class menuLogin:
         self.roomcr.combrobarRoomEspera(room)
         os.system('cls')
     
-    def joinRoom(self):
-        self.roomcr.user = self.user
+        from src.utils.visuals import get_key
         salas = self.roomsdb.getRoomActivos()
-        if len(salas) == 0:
-            while len(salas) == 0:
+        while True:
+            os.system('cls')
+            if len(salas) == 0:
                 print(f"{'='*50}")
                 print(f"{'LISTA DE SALAS':^50}")
                 print(f"{'='*50}\n")
                 print("  [!] No hay salas disponibles\n")
                 print("  Opciones:")
-                print("    [1] Refrescar")
-                print("    [2] Salir\n")
+                print("    [0] Refrescar")
+                print("    [X] Volver\n")
                 print(f"{'='*50}")
-                option = input("  Elige una opción: ")
-                if option == "2":
-                    break
-                salas = self.roomsdb.getRoomActivos()
-                os.system('cls')
-        
-        if len(salas) > 0:
-            option = "0"
-            while option == "0":
+                option = get_key()
+                if option == 'x': break
+                if option == '0':
+                    salas = self.roomsdb.getRoomActivos()
+                    continue
+            else:
                 print(f"{'='*50}")
                 print(f"{'SALAS DISPONIBLES':^50}")
                 print(f"{'='*50}\n")
-                num = 0
-                for sala in salas:
-                    num += 1
-                    print(f"  [{num}] - {sala.nombre}")
+                for i, sala in enumerate(salas):
+                    print(f"  [{i+1}] - {sala.nombre}")
                 
                 print("\n  [0] Refrescar")
-                print("  [-1] Salir\n")
+                print("  [X] Volver\n")
                 print(f"{'='*50}")
-                option = input("  Elige una sala: ")
+                option = get_key()
 
-                if option == "-1":
-                    break
+                if option == 'x': break
+                if option == '0':
+                    salas = self.roomsdb.getRoomActivos()
+                    continue
                 
-                if str(len(salas)) == option:
-                    sala = salas[int(option) - 1]
-                    sala.enemigo_id = self.user.id
-                    self.roomsdb.updateRoom(sala)
-                    self.roomcr.combrobarRoomEspera(sala)
-                os.system('cls')
+                try:
+                    num_opt = int(option)
+                    if 1 <= num_opt <= len(salas):
+                        sala = salas[num_opt - 1]
+                        sala.enemigo_id = self.user.id
+                        self.roomsdb.updateRoom(sala)
+                        self.roomcr.combrobarRoomEspera(sala)
+                        break
+                except:
+                    pass
+        os.system('cls')
         
         os.system('cls')
