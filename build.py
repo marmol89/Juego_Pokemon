@@ -12,6 +12,9 @@ def build():
     # Archivo principal
     main_script = "app.py"
     
+    # Separador para --add-data es diferente en Windows (;) y Linux/Mac (:)
+    sep = ";" if platform.system() == "Windows" else ":"
+    
     # Comando base de PyInstaller
     cmd = [
         sys.executable,
@@ -19,6 +22,7 @@ def build():
         "PyInstaller",
         "--onefile",
         f"--name={output_name}",
+        f"--add-data=.env{sep}.",
         "--clean",
         main_script
     ]

@@ -1,7 +1,16 @@
 import os
+import sys
+import time
 from dotenv import load_dotenv
 from supabase import create_client, Client
 
+# Soporte para ejecutables (PyInstaller)
+if getattr(sys, 'frozen', False):
+    # Si es un ejecutable, el .env puede estar empaquetado
+    bundle_dir = getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__)))
+    load_dotenv(os.path.join(bundle_dir, '.env'))
+
+# También cargamos del directorio actual por si hay uno externo (sobrescribe lo anterior)
 load_dotenv()
 
 class db:
