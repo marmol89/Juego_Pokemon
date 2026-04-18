@@ -23,6 +23,10 @@ class room:
     def enemigo_id(self):
         return self._enemigo_id
     
+    @enemigo_id.setter
+    def enemigo_id(self, value):
+        self._enemigo_id = value
+    
     @property
     def nombre(self):
         return self._nombre
@@ -30,6 +34,10 @@ class room:
     @property
     def estado(self):
         return self._estado
+    
+    @estado.setter
+    def estado(self, value):
+        self._estado = value
     
     def getUser(self):
         userdb = users()

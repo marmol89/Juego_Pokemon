@@ -10,6 +10,10 @@ class pokemon:
         self._puntos_de_salud = puntos_de_salud
     
     @property
+    def id(self):
+        return self._id
+        
+    @property
     def nombre(self):
         return self._nombre
     
