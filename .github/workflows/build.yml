@@ -36,8 +36,44 @@ jobs:
       run: |
         python build.py
         
+    - name: Rename executable for release
+      shell: bash
+      run: |
+        mkdir -p release_files
+        if [ -f dist/JuegoPokemon.exe ]; then
+          mv dist/JuegoPokemon.exe release_files/JuegoPokemon-windows.exe
+        elif [ -f dist/JuegoPokemon ]; then
+          mv dist/JuegoPokemon release_files/${{ matrix.artifact_name }}
+        fi
+
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.artifact_name }}
-        path: dist/
+        path: release_files/
+
+  release:
+    name: Create GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: all_artifacts
+        merge-multiple: true
+        
+    - name: Create Release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: latest
+        name: Latest Build
+        draft: false
+        prerelease: false
+        files: |
+          all_artifacts/JuegoPokemon-windows.exe
+          all_artifacts/JuegoPokemon-linux
+          all_artifacts/JuegoPokemon-macos
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
