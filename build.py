@@ -29,6 +29,13 @@ def build():
     try:
         print(f"Ejecutando: {' '.join(cmd)}")
         subprocess.check_call(cmd)
+        
+        # Copiar .env a dist si existe para comodidad del usuario local
+        import shutil
+        if os.path.exists(".env"):
+            shutil.copy(".env", os.path.join("dist", ".env"))
+            print("  [+] Archivo .env copiado a la carpeta 'dist'")
+
         print("\n" + "="*50)
         print(f"¡CONSTRUCCIÓN COMPLETADA CON ÉXITO!")
         print(f"El archivo se encuentra en la carpeta: {os.path.join(os.getcwd(), 'dist')}")
