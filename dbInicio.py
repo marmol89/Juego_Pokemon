@@ -1,77 +1,67 @@
 from src.database.db import db
 import time
+import os
 
 dbp = db().get_connection()
 
 def borrarTablas():
-    # En Supabase no podemos ejecutar "DROP TABLE" y "CREATE TABLE" puramente
-    # a través de la API básica, ya que esta previene la destrucción de esquemas en producción.
-    # Por tanto, vaciamos todas las tablas en lugar de destruirlas y rehacerlas.
-    
     if not dbp:
         print("Error: No se pudo conectar a Supabase.")
         return
         
     try:
+        # El orden es importante por las claves foráneas
+        dbp.table("user_items").delete().gte("id", 0).execute()
+        dbp.table("items").delete().gte("id", 0).execute()
         dbp.table("movements").delete().gte("id", 0).execute()
         dbp.table("battles").delete().gte("id", 0).execute()
         dbp.table("teams").delete().gte("id", 0).execute()
         dbp.table("rooms").delete().gte("id", 0).execute()
         dbp.table("pokemons").delete().gte("id", 0).execute()
         dbp.table("users").delete().gte("id", 0).execute()
-        print("Datos de todas las tablas borrados correctamente.")
+        print("✅ Base de datos vaciada correctamente.")
     except Exception as e:
-        print("\nError borrando tablas.")
-        print("¿Asegúrate de que ya has creado las tablas vacías en el Editor SQL de Supabase copiando el código de supabase_schema.sql como indicaban las instrucciones de antes?\n\nDetalles del error:", e)
+        print("\n❌ Error borrando tablas:", e)
 
 def borrarSalas():
-    if not dbp:
-        return
-        
+    if not dbp: return
     try:
         dbp.table("movements").delete().gte("id", 0).execute()
         dbp.table("battles").delete().gte("id", 0).execute()
         dbp.table("teams").delete().gte("id", 0).execute()
         dbp.table("rooms").delete().gte("id", 0).execute()
-        print("Salas e historiales de batalla borrados.")
+        print("✅ Salas e historiales de batalla borrados.")
     except Exception as e:
-        print("Error borrando salas:", e)
+        print("❌ Error borrando salas:", e)
 
-def insetarPokemons():
-    if not dbp: return
-    
-    # Supabase permite insertar arrays de JSON (listas de diccionarios en Python) directamente
-    pokemons = [
-        {
-            "nombre": "Charizard", 
-            "tipos": ["FUEGO", "VOLADOR"], 
-            "movimientos": [{'nombre': 'Ascuas', 'tipo': 'FUEGO', 'poder': 25, 'PP': 40, 'Prec': 100}, {'nombre': 'Onda ígnea', 'tipo': 'FUEGO', 'poder': 10, 'PP': 95, 'Prec': 90}],
-            "EVs": {'ataque': 84, 'defensa': 78, 'velocidad': 100},
-            "puntos_de_salud": 78
-        },
-        {
-            "nombre": "Venusaur", 
-            "tipos": ["PLANTA", "VENENO"], 
-            "movimientos": [{'nombre': 'Hoja afilada', 'tipo': 'PLANTA', 'poder': 25, 'PP': 55, 'Prec': 95}, {'nombre': 'Placaje', 'tipo': 'NORMAL', 'poder': 35, 'PP': 50, 'Prec': 100}],
-            "EVs": {'ataque': 82, 'defensa': 83, 'velocidad': 80},
-            "puntos_de_salud": 80
-        }
-    ]
-    
-    try:
-        dbp.table("pokemons").insert(pokemons).execute()
-        print("Pokemons iniciales guardados.")
-    except Exception as e:
-        print("Error insertando pokemons:", e)
+print("="*50)
+print(f"{'GESTOR DE BASE DE DATOS POKÉMON':^50}")
+print("="*50)
+print("  [1] Reset Total (Borrar todo y re-sembrar Pokémones/Tienda)")
+print("  [2] Limpiar Salas (Borrar partidas activas)")
+print("  [0] Salir")
+print("="*50)
 
-
-print("Que quieres borrar ?")
-print("1 - Todo")
-print("2 - Salas")
-opcion = input("option: ")
+opcion = input("  Elige una opción: ")
 
 if opcion == "1":
     borrarTablas()
-    insetarPokemons()
+    
+    print("\n[+] Iniciando carga de datos...")
+    # Importar y ejecutar seeders
+    try:
+        from src.scripts.seed_pokemons import main as seed_pokemons
+        from src.scripts.seed_items import seed_items
+        
+        seed_pokemons()
+        seed_items()
+        print("\n✅ ¡Inicialización completa!")
+    except Exception as e:
+        print(f"\n❌ Error durante la siembra de datos: {e}")
+
 elif opcion == "2":
     borrarSalas()
+elif opcion == "0":
+    print("Saliendo...")
+else:
+    print("Opción no válida.")
