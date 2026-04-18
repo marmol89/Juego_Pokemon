@@ -4,7 +4,7 @@ from src.database.battles import battles
 from src.Controllers.battleController import battleController
 
 class teamController:
-    user = any
+    user = None
     def __init__(self , room, user):
         self.room = room
         self.user = user

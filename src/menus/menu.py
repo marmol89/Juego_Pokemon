@@ -42,6 +42,8 @@ class menu:
         data = usersdb.login(username, password)
         if data == False:
             print("Usuario o password incorrecto")
+            self.user = None
+            return None
         self.user = data
         return self.user
         

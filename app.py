@@ -28,6 +28,4 @@ while True:
         menu.inicio()
 
 
-
-
-pokemonDB.dbp.close()
+

@@ -6,7 +6,7 @@ from src.database.battles import battles
 
 class menuLogin:
 
-    user = any
+    user = None
 
     def __init__(self):
         self.roomsdb = rooms()
@@ -37,7 +37,7 @@ class menuLogin:
             self.joinRoom()
     
     def logut(self):
-        self.user = any
+        self.user = None
         os.system('cls')
     
     def createRoom(self):

@@ -4,7 +4,7 @@ from src.Controllers.teamController import teamController
 import time
 
 class roomController:
-    user = any
+    user = None
     def __init__(self):
         self.menuRoom = menuRoom()
         self.roomsdb = rooms()
