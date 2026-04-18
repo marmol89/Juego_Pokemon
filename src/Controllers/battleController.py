@@ -1,10 +1,12 @@
 import time
+import json
 from src.menus.menuBattle import menuBattle
 class battleController:
     def __init__(self, room, user):
         self.room = room
         self.battle = room.getBattle()
         self.user = user
+        self.items_used = 0
         self.updateTeams()
     
     def inicio(self):
@@ -35,7 +37,22 @@ class battleController:
                 userPokemon = self.room.pokemonActivoEnemigo()
                 enemyPokemon = self.room.pokemonActivoUser()
             
-            move = menuBattle(self.room).combate(self.user, self.enemy, self.userTeam, self.enemyTeam)
+            move = menuBattle(self.room).combate(self.user, self.enemy, self.userTeam, self.enemyTeam, self.items_used)
+            
+            # Si eligió mochila
+            if move.get("tipo_accion") == "item":
+                chosen_item = menuBattle(self.room).mochila(self.user.id, self.items_used)
+                if chosen_item is None:
+                    continue # Vuelve al menú anterior
+                
+                self.items_used += 1 # Incrementar contador
+                move = {
+                    "nombre": f"Item: {chosen_item.nombre}",
+                    "tipo_accion": "use_item",
+                    "item_id": chosen_item.id,
+                    "efecto_item": chosen_item.efecto
+                }
+
             movCS.insertMovement(self.room.id, userPokemon.id, move['nombre'], json.dumps(move))
             
             print("Esperando la acción del oponente...")
@@ -46,32 +63,55 @@ class battleController:
                 
             opponentMove = json.loads(opponentMoveRow['efecto'])
             
-            if userPokemon.velocidad >= enemyPokemon.velocidad:
-                firstAtk, firstDef = userPokemon, enemyPokemon
-                firstMove, secondMove = move, opponentMove
-                firstVidaVar, secondVidaVar = activeUserTeam, activeEnemyTeam
-                firstName, secondName = self.user.username, self.enemy.username
-            else:
-                firstAtk, firstDef = enemyPokemon, userPokemon
-                firstMove, secondMove = opponentMove, move
-                firstVidaVar, secondVidaVar = activeEnemyTeam, activeUserTeam
-                firstName, secondName = self.enemy.username, self.user.username
-                
-            def calc_damage(atk, dfen, pwr):
-                return max(1, int((atk / dfen) * pwr * 0.5))
-
-            print(f"\n{firstName} usa {firstMove['nombre']}!")
-            dmg1 = calc_damage(firstAtk.ataque, firstDef.defensa, firstMove['poder'])
-            secondVidaVar.vida -= dmg1
-            print(f"Causa {dmg1} puntos de daño.")
-            time.sleep(2)
+            # --- RESOLUCIÓN DE TURNO CON OBJETOS ---
+            # Para simplificar, los objetos siempre se usan AL PRINCIPIO del turno antes que cualquier ataque.
+            # Si ambos usan objetos, se procesan en orden de velocidad.
             
-            if secondVidaVar.vida > 0:
-                print(f"\n{secondName} usa {secondMove['nombre']}!")
-                dmg2 = calc_damage(firstDef.ataque, firstAtk.defensa, secondMove['poder'])
-                firstVidaVar.vida -= dmg2
-                print(f"Causa {dmg2} puntos de daño.")
-                time.sleep(2)
+            participants = [
+                {"user": self.user, "pokemon": userPokemon, "move": move, "team": activeUserTeam, "is_user": True},
+                {"user": self.enemy, "pokemon": enemyPokemon, "move": opponentMove, "team": activeEnemyTeam, "is_user": False}
+            ]
+            
+            # Ordenar por velocidad (o prioridad si la hubiera)
+            if userPokemon.velocidad < enemyPokemon.velocidad:
+                participants.reverse()
+            
+            for p in participants:
+                m = p["move"]
+                t = p["team"]
+                pok = p["pokemon"]
+                
+                if m.get("tipo_accion") == "use_item":
+                    # Aplicar item
+                    print(f"\n{p['user'].username} usa {m['nombre']}!")
+                    efecto = m.get("efecto_item", {})
+                    if "cura" in efecto:
+                        cura = efecto["cura"]
+                        t.vida = min(pok.puntos_de_salud, t.vida + cura)
+                        print(f"¡{pok.nombre} recupera vida!")
+                    
+                    # Consumir de la DB (solo si lo usó el usuario actual localmente)
+                    if p["is_user"]:
+                        from src.database.items import items
+                        items().consumeItem(self.user.id, m["item_id"])
+                    time.sleep(2)
+                else:
+                    # Es un ataque normal
+                    # Primero comprobamos si el atacante sigue vivo
+                    if t.vida <= 0: continue
+                    
+                    # Identificar defensor
+                    defensor = participants[1] if p == participants[0] else participants[0]
+                    def_pok = defensor["pokemon"]
+                    def_team = defensor["team"]
+                    
+                    if def_team.vida <= 0: continue
+
+                    print(f"\n{p['user'].username} usa {m['nombre']}!")
+                    dmg = max(1, int((pok.ataque / def_pok.defensa) * m['poder'] * 0.5))
+                    def_team.vida -= dmg
+                    print(f"Causa {dmg} puntos de daño a {def_pok.nombre}.")
+                    time.sleep(2)
             
             teamdb.updateVida(activeUserTeam.id, activeUserTeam.vida)
             

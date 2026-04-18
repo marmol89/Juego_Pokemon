@@ -27,6 +27,7 @@ class menuLogin:
         print("  Opciones:")
         print("    [1] Crear Sala")
         print("    [2] Unirte a una Sala")
+        print("    [3] Tienda")
         print("    [0] Cerrar Sesión\n")
         print(f"{'='*50}")
         optionI = input("  Elige una opción: ")
@@ -41,6 +42,13 @@ class menuLogin:
         if optionI == '2':
             os.system('cls')
             self.joinRoom()
+        if optionI == '3':
+            os.system('cls')
+            self.openShop()
+
+    def openShop(self):
+        from src.menus.menuShop import menuShop
+        menuShop(self.user).mostrar()
     
     def logut(self):
         self.user = None

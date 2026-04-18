@@ -3,7 +3,8 @@
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     username VARCHAR(255) UNIQUE NOT NULL,
-    password VARCHAR(600) NOT NULL
+    password VARCHAR(600) NOT NULL,
+    puntos INTEGER DEFAULT 0
 );
 
 CREATE TABLE pokemons (
@@ -50,6 +51,21 @@ CREATE TABLE movements (
     efecto VARCHAR(255) NOT NULL
 );
 
+CREATE TABLE items (
+    id SERIAL PRIMARY KEY,
+    nombre TEXT NOT NULL,
+    descripcion TEXT,
+    precio INTEGER DEFAULT 100,
+    efecto JSONB 
+);
+
+CREATE TABLE user_items (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    item_id INTEGER REFERENCES items(id) ON DELETE CASCADE,
+    cantidad INTEGER DEFAULT 1
+);
+
 -- Desactivar Row Level Security (RLS) para permitir lectura/escritura libre desde Python
 ALTER TABLE users DISABLE ROW LEVEL SECURITY;
 ALTER TABLE pokemons DISABLE ROW LEVEL SECURITY;
@@ -57,8 +73,16 @@ ALTER TABLE rooms DISABLE ROW LEVEL SECURITY;
 ALTER TABLE teams DISABLE ROW LEVEL SECURITY;
 ALTER TABLE battles DISABLE ROW LEVEL SECURITY;
 ALTER TABLE movements DISABLE ROW LEVEL SECURITY;
+ALTER TABLE items DISABLE ROW LEVEL SECURITY;
+ALTER TABLE user_items DISABLE ROW LEVEL SECURITY;
 
 -- Insertar Pokemons Iniciales
 INSERT INTO pokemons (nombre, tipos, movimientos, "EVs", puntos_de_salud) VALUES 
 ('Charizard', '["FUEGO", "VOLADOR"]', '[{"nombre": "Ascuas", "tipo": "FUEGO", "poder": 25, "PP": 40, "Prec": 100}, {"nombre": "Onda ígnea", "tipo": "FUEGO", "poder": 10, "PP": 95, "Prec": 90}]', '{"ataque": 84, "defensa": 78, "velocidad": 100}', 78),
 ('Venusaur', '["PLANTA", "VENENO"]', '[{"nombre": "Hoja afilada", "tipo": "PLANTA", "poder": 25, "PP": 55, "Prec": 95}, {"nombre": "Placaje", "tipo": "NORMAL", "poder": 35, "PP": 50, "Prec": 100}]', '{"ataque": 82, "defensa": 83, "velocidad": 80}', 80);
+
+-- Insertar catálogo de la tienda
+INSERT INTO items (nombre, descripcion, precio, efecto) VALUES 
+('Poción', 'Restaura 50 HP de un Pokémon', 100, '{"cura": 50}'),
+('Superpoción', 'Restaura 100 HP de un Pokémon', 250, '{"cura": 100}'),
+('Restaurar Todo', 'Cura toda la vida del Pokémon', 600, '{"cura": 999}');

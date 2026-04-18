@@ -31,7 +31,7 @@ class menuBattle:
         print(f"\n{'='*70}")
         time.sleep(3)
 
-    def combate(self, user, enemy , userTeam, enemyTeam):
+    def combate(self, user, enemy , userTeam, enemyTeam, items_used=0):
         os.system('cls')
         userPokemon = self.room.getMyActivePokemon(user.id)
         enemyPokemon = self.room.getTheirActivePokemon(user.id)
@@ -59,12 +59,24 @@ class menuBattle:
         for i, mov in enumerate(movimientos):
             print(f"   [{i+1}] {mov['nombre'][:15]:<15} (Poder: {mov['poder']:>3} | Tipo: {mov['tipo']})")
         
+        status_mochila = f"({items_used}/5)"
+        if items_used >= 5:
+            print(f"   [5] MOCHILA {status_mochila} [LÍMITE ALCANZADO]")
+        else:
+            print(f"   [5] MOCHILA {status_mochila}")
+        
         print()
         while True:
             try:
                 opcion = int(input("  Elige una opción: "))
                 if 1 <= opcion <= len(movimientos):
                     return movimientos[opcion - 1]
+                if opcion == 5:
+                    if items_used >= 5:
+                        print("  [!] Ya has usado el máximo de 5 objetos en esta batalla.")
+                        time.sleep(1.5)
+                        return self.combate(user, enemy, userTeam, enemyTeam, items_used)
+                    return {"tipo_accion": "item"}
             except:
                 pass
     
@@ -103,5 +115,36 @@ class menuBattle:
                 opcion = int(input("   Elige una opción: "))
                 if 1 <= opcion <= len(vivos):
                     return vivos[opcion - 1]
+            except:
+                pass
+
+    def mochila(self, user_id, items_used=0):
+        from src.database.items import items
+        inventory = items().getUserItems(user_id)
+        
+        while True:
+            os.system('cls')
+            print(f"{'='*70}")
+            print(f"{'MOCHILA ' + f'({items_used}/5)':^70}")
+            print(f"{'='*70}\n")
+            
+            if not inventory:
+                print("    (No tienes objetos disponibles)")
+                time.sleep(1.5)
+                return None
+            
+            for i, inv in enumerate(inventory):
+                it = inv['item']
+                print(f"   [{i+1}] {it.nombre:<15} x{inv['cantidad']} - {it.descripcion}")
+            
+            print(f"\n   [0] VOLVER")
+            print(f"\n{'='*70}")
+            
+            try:
+                choice = int(input("   Elige un objeto: "))
+                if choice == 0:
+                    return None
+                if 1 <= choice <= len(inventory):
+                    return inventory[choice - 1]['item']
             except:
                 pass
