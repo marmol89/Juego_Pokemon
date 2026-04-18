@@ -132,7 +132,8 @@ class battleController:
                     if def_team.vida <= 0: continue
 
                     type_text(f"\n{p['user'].username} usa {m['nombre']}!")
-                    dmg = max(1, int((pok.ataque / def_pok.defensa) * m['poder'] * 0.5))
+                    from src.utils.combat.damage import calculate_damage
+                    dmg = calculate_damage(pok, def_pok, m['poder'])
                     
                     vida_antes = def_team.vida
                     def_team.vida = max(0, def_team.vida - dmg)
