@@ -1,14 +1,17 @@
 class user:
     def __init__(self, id, username, password):
-        self.id = id
-        self.username = username
-        self.password = password
+        self._id = id
+        self._username = username
+        self._password = password
     
+    @property
     def id(self):
-        return self.id
+        return self._id
     
+    @property
     def username(self):
-        return self.username
+        return self._username
     
+    @property
     def password(self):
-        return self.password
+        return self._password

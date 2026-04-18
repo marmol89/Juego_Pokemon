@@ -4,7 +4,7 @@ from src.database.users import users
 
 class menu:
     logut = False
-    user = any
+    user = None
 
     def __init__(self):
         os.system('cls')

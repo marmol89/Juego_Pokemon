@@ -1,22 +1,21 @@
-import mysql.connector
 import os
 from dotenv import load_dotenv
+from supabase import create_client, Client
+
 load_dotenv()
+
 class db:
 
-    mydb = any
+    _client = None
 
     def __init__(self):
-        self.mydb = mysql.connector.connect(
-                    host=os.getenv('HOST_MYSQL'),
-                    user=os.getenv('USER_MYSQL'),
-                    password=os.getenv('PASS_MYSQL'),
-                    database=os.getenv('DATABASE_MYSQL')
-            )
+        url = os.getenv("SUPABASE_URL")
+        key = os.getenv("SUPABASE_KEY")
+        if url and key:
+            self._client = create_client(url, key)
         
-    def mydb(self):
-        return self.mydb
+    def get_connection(self) -> Client:
+        return self._client
     
     def close(self):
-        if self.mydb != any:
-            self.mydb.close()
+        pass

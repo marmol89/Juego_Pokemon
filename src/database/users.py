@@ -6,56 +6,41 @@ class users:
     salt = 'patata'
 
     def __init__(self):
-        self.dbp = db().mydb
+        self.dbp = db().get_connection()
     
     def cifrar_contrasena(self, password):
-        passwordS = password + self.salt
-        hashed = hashlib.sha512(passwordS.encode()).hexdigest()
-        return hashed
+        contrasena_codificada = password.encode('utf-8')
+        hashed = hashlib.pbkdf2_hmac('sha256', contrasena_codificada, self.salt.encode('utf-8'), 100000)
+        return hashed.hex()
     
-    def verificar_contrasena(self , contrasena, hashed):
-        contrasena_codificada = contrasena.encode('utf-8')
-        nuevo_hash = hashlib.pbkdf2_hmac('sha256', contrasena_codificada, self.salt, 100000)
-        return nuevo_hash == hashed
+    def verificar_contrasena(self, contrasena, hashed_hex):
+        return self.cifrar_contrasena(contrasena) == hashed_hex
     
     def verificarUser(self , username):
-        mycursor = self.dbp.cursor()
-        sql = "SELECT * FROM users WHERE username=%s"
-        mycursor.execute(sql , (username ,))
-        data = mycursor.fetchone()  
-        if(data == None):
-            return True
-        return False
+        if not self.dbp: return False
+        data = self.dbp.table("users").select("*").eq("username", username).execute()
+        return len(data.data) == 0
 
     def createUser(self, username, password):
-        mycursor = self.dbp.cursor()
-        sql = "INSERT INTO users (username, password) VALUES (%s, %s)"
-        val = (username, self.cifrar_contrasena(password))
-        mycursor.execute(sql, val)
-        self.dbp.commit()
+        if not self.dbp: return False
+        val = {"username": username, "password": self.cifrar_contrasena(password)}
+        self.dbp.table("users").insert(val).execute()
         return True
     
     def login(self, username, password):
-        mycursor = self.dbp.cursor()
-        sql = "SELECT * FROM users WHERE username=%s"
-        mycursor.execute(sql, (username ,))
-        data = mycursor.fetchone()
-        if data == None:
+        if not self.dbp: return None
+        data = self.dbp.table("users").select("*").eq("username", username).execute()
+        if len(data.data) == 0:
             return None
-        if data[2] != self.cifrar_contrasena(password):
+        user_row = data.data[0]
+        if not self.verificar_contrasena(password, user_row['password']):
             return None
-        if len(data) > 1:
-            userl = user(data[0], data[1], data[2])
-            return userl
+        return user(user_row['id'], user_row['username'], user_row['password'])
     
     def getUser(self, id):
-        mycursor = self.dbp.cursor()
-        sql = "SELECT * FROM users WHERE id=%s"
-        mycursor.execute(sql, (id ,))
-        data = mycursor.fetchone()
-        if data == None:
+        if not self.dbp: return None
+        data = self.dbp.table("users").select("*").eq("id", id).execute()
+        if len(data.data) == 0:
             return None
-        if len(data) > 1:
-            userl = user(data[0], data[1], data[2])
-            return userl
-        
+        user_row = data.data[0]
+        return user(user_row['id'], user_row['username'], user_row['password'])

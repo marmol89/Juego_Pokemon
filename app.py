@@ -18,8 +18,8 @@ while True:
     if menu.logut:
         break
 
-    if menu.user != None and menu.user != any:
-        if menuLogin.user == any:
+    if menu.user is not None:
+        if menuLogin.user is None:
             menuLogin.user = menu.user
         menuLogin.inicio()
         menu.user = menuLogin.user

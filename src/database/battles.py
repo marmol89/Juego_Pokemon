@@ -1,61 +1,53 @@
 from src.database.db import db
 from src.models.user import user
 from src.models.pokemon import pokemon
-import json
+
 class battles:
     def __init__(self):
-        self.dbp = db().mydb
+        self.dbp = db().get_connection()
     
     def createBattle(self, room_id):
-        mycursor = self.dbp.cursor()
-        sql = "INSERT INTO battles (room_id) VALUES (%s)"
-        val = (room_id,)
-        mycursor.execute(sql, val)
-        self.dbp.commit()
-        return mycursor.lastrowid
+        if not self.dbp: return None
+        val = {"room_id": room_id}
+        res = self.dbp.table("battles").insert(val).execute()
+        return res.data[0]['id'] if res.data else None
     
-    def updateBattle(self, battle):
-        mycursor = self.dbp.cursor()
-        sql = "UPDATE battles SET winner_id=%s , loser_id=%s , user_team_ids=%s , enemy_team_ids=%s WHERE room_id=%s"
-        val = (battle.winner_id, battle.loser_id, json.dumps(battle.user_team_ids), json.dumps(battle.enemy_team_ids), battle.room_id)
-        mycursor.execute(sql, val)
-        self.dbp.commit()
+    def updateBattle(self, b):
+        if not self.dbp: return None
+        val = {
+            "winner_id": b.winner_id,
+            "loser_id": b.loser_id,
+            "user_team_ids": b.user_team_ids,
+            "enemy_team_ids": b.enemy_team_ids
+        }
+        self.dbp.table("battles").update(val).eq("room_id", b.room_id).execute()
     
     def getUser(self, battle_id):
-        mycursor = self.dbp.cursor()
-        sql = "SELECT users.* FROM battles JOIN rooms ON battles.room_id = rooms.id JOIN users ON rooms.user_id = users.id WHERE battles.id =%s;"
-        mycursor.execute(sql, (battle_id,))
-        data = mycursor.fetchone()
+        if not self.dbp: return None
+        data = self.dbp.table("battles").select("rooms!inner(user_id)").eq("id", battle_id).execute()
+        if not data.data or not data.data[0].get('rooms'): return None
+        uid = data.data[0]['rooms']['user_id']
+        u_data = self.dbp.table("users").select("*").eq("id", uid).execute()
+        if not u_data.data: return None
+        usr = u_data.data[0]
+        return user(usr['id'], usr['username'], usr['password'])
         
-        if data != None:
-            data = user(data[0], data[1], data[2])
-        
-        self.dbp.commit()
-        return data
-    
     def getEnemy(self, battle_id):
-        mycursor = self.dbp.cursor()
-        sql = "SELECT users.* FROM battles JOIN rooms ON battles.room_id = rooms.id JOIN users ON rooms.enemigo_id = users.id WHERE battles.id =%s;"
-        mycursor.execute(sql, (battle_id,))
-        data = mycursor.fetchone()
+        if not self.dbp: return None
+        data = self.dbp.table("battles").select("rooms!inner(enemigo_id)").eq("id", battle_id).execute()
+        if not data.data or not data.data[0].get('rooms'): return None
+        enemy_id = data.data[0]['rooms']['enemigo_id']
+        u_data = self.dbp.table("users").select("*").eq("id", enemy_id).execute()
+        if not u_data.data: return None
+        usr = u_data.data[0]
+        return user(usr['id'], usr['username'], usr['password'])
         
-        if data != None:
-            data = user(data[0], data[1], data[2])
-        
-        self.dbp.commit()
-        return data
+    def updateBattleUserTeam(self, b):
+        if not self.dbp: return None
+        val = {"user_team_ids": b.user_team_ids}
+        self.dbp.table("battles").update(val).eq("room_id", b.room_id).execute()
     
-    def updateBattleUserTeam(self, battle):
-        mycursor = self.dbp.cursor()
-        sql = "UPDATE battles SET user_team_ids=%s WHERE room_id=%s"
-        val = (json.dumps(battle.user_team_ids), battle.room_id)
-        mycursor.execute(sql, val)
-        self.dbp.commit()
-    
-    def updateBattleEnemyTeam(self, battle):
-        mycursor = self.dbp.cursor()
-        sql = "UPDATE battles SET enemy_team_ids=%s WHERE room_id=%s"
-        val = (json.dumps(battle.enemy_team_ids), battle.room_id)
-        mycursor.execute(sql, val)
-        self.dbp.commit()
-        
+    def updateBattleEnemyTeam(self, b):
+        if not self.dbp: return None
+        val = {"enemy_team_ids": b.enemy_team_ids}
+        self.dbp.table("battles").update(val).eq("room_id", b.room_id).execute()

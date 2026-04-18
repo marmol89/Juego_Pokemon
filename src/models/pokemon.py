@@ -1,33 +1,40 @@
 class pokemon:
     def __init__(self, id , nombre, tipos, movimientos, EVs, puntos_de_salud):
-        self.id = id
-        self.nombre = nombre
-        self.tipos = tipos
-        self.movimientos = movimientos
-        self.ataque = EVs['ataque']
-        self.defensa = EVs['defensa']
-        self.velocidad = EVs['velocidad']
-        self.puntos_de_salud = puntos_de_salud
+        self._id = id
+        self._nombre = nombre
+        self._tipos = tipos
+        self._movimientos = movimientos
+        self._ataque = EVs['ataque']
+        self._defensa = EVs['defensa']
+        self._velocidad = EVs['velocidad']
+        self._puntos_de_salud = puntos_de_salud
     
+    @property
     def nombre(self):
-        return self.nombre
+        return self._nombre
     
+    @property
     def tipos(self):
-        return self.tipos
+        return self._tipos
     
+    @property
     def movimientos(self):
-        return self.movimientos
+        return self._movimientos
     
+    @property
     def ataque(self):
-        return self.ataque
+        return self._ataque
     
+    @property
     def defensa(self):
-        return self.defensa
+        return self._defensa
     
+    @property
     def velocidad(self):
-        return self.velocidad
+        return self._velocidad
     
+    @property
     def puntos_de_salud(self):
-        if self.puntos_de_salud <= 0:
-            self.puntos_de_salud = 0
-        return self.puntos_de_salud
+        if self._puntos_de_salud <= 0:
+            self._puntos_de_salud = 0
+        return self._puntos_de_salud

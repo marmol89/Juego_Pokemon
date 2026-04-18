@@ -1,100 +1,61 @@
 from src.database.db import db
 from src.models.room import room
-class rooms:
 
+class rooms:
     def __init__(self):
-        self.dbp = db().mydb
+        self.dbp = db().get_connection()
     
     def getRooms(self):
-        mycursor = self.dbp.cursor()
-        sql = "SELECT * FROM rooms"
-        mycursor.execute(sql)
-        data = mycursor.fetchall()
-        rooms = []
-        if room != None:
-            for row in data:
-                rooms.append(room(row[0], row[1], row[2], row[3], row[4]))
-        return rooms
+        if not self.dbp: return []
+        data = self.dbp.table("rooms").select("*").execute()
+        return [room(row['id'], row['user_id'], row['enemigo_id'], row['nombre'], row['estado']) for row in data.data]
     
     def getRoomActivos(self):
-        mycursor = self.dbp.cursor()
-        sql = "SELECT * FROM rooms where estado=1"
-        mycursor.execute(sql)
-        data = mycursor.fetchall()
-        rooms = []
-        if room != None:
-            for row in data:
-                rooms.append(room(row[0], row[1], row[2], row[3], row[4]))
-        return rooms
+        if not self.dbp: return []
+        data = self.dbp.table("rooms").select("*").eq("estado", 1).execute()
+        return [room(row['id'], row['user_id'], row['enemigo_id'], row['nombre'], row['estado']) for row in data.data]
     
     def getRoomCerrados(self):
-        mycursor = self.dbp.cursor()
-        sql = "SELECT * FROM rooms where estado=2"
-        mycursor.execute(sql)
-        data = mycursor.fetchall()
-        rooms = []
-        if room != None:
-            for row in data:
-                rooms.append(room(row[0], row[1], row[2], row[3], row[4]))
-        return rooms
+        if not self.dbp: return []
+        data = self.dbp.table("rooms").select("*").eq("estado", 2).execute()
+        return [room(row['id'], row['user_id'], row['enemigo_id'], row['nombre'], row['estado']) for row in data.data]
     
     def getRoomFinalizados(self):
-        mycursor = self.dbp.cursor()
-        sql = "SELECT * FROM rooms where estado=3"
-        mycursor.execute(sql)
-        data = mycursor.fetchall()
-        rooms = []
-        if room != None:
-            for row in data:
-                rooms.append(room(row[0], row[1], row[2], row[3], row[4]))
-        return rooms
+        if not self.dbp: return []
+        data = self.dbp.table("rooms").select("*").eq("estado", 3).execute()
+        return [room(row['id'], row['user_id'], row['enemigo_id'], row['nombre'], row['estado']) for row in data.data]
     
     def getRoomUser(self, user_id):
-        mycursor = self.dbp.cursor()
-        sql = "SELECT * FROM rooms where user_id=%s OR enemigo_id=%s"
-        mycursor.execute(sql, (user_id, user_id))
-        data = mycursor.fetchall()
-        rooms = []
-
-        if room != None:
-            for row in data:
-                rooms.append(room(row[0], row[1], row[2], row[3], row[4]))
-        return rooms
+        if not self.dbp: return []
+        data = self.dbp.table("rooms").select("*").or_(f"user_id.eq.{user_id},enemigo_id.eq.{user_id}").execute()
+        return [room(row['id'], row['user_id'], row['enemigo_id'], row['nombre'], row['estado']) for row in data.data]
     
     def getRoomUserActiva(self, user_id):
-        mycursor = self.dbp.cursor()
-        sql = "SELECT * FROM rooms where (user_id=%s OR enemigo_id=%s) AND estado=1"
-        mycursor.execute(sql, (user_id, user_id))
-        data = mycursor.fetchone()
-        
-        if room != None:
-            data = room(data[0], data[1], data[2], data[3], data[4])
-        
-        return data
+        if not self.dbp: return None
+        # Eq estado=1 y el OR para el ID de usuario u oponente
+        data = self.dbp.table("rooms").select("*").eq("estado", 1).or_(f"user_id.eq.{user_id},enemigo_id.eq.{user_id}").execute()
+        if len(data.data) == 0: return None
+        row = data.data[0]
+        return room(row['id'], row['user_id'], row['enemigo_id'], row['nombre'], row['estado'])
     
-    def createRoom(self, user_id , name):
-        mycursor = self.dbp.cursor()
-        sql = "INSERT INTO rooms (user_id, nombre, estado) VALUES (%s, %s, %s)"
-        val = (user_id , name , 1)
-        mycursor.execute(sql, val)
-        self.dbp.commit()
-        print(mycursor.execute(sql, val))
+    def createRoom(self, user_id, name):
+        if not self.dbp: return None
+        val = {"user_id": user_id, "nombre": name, "estado": 1}
+        self.dbp.table("rooms").insert(val).execute()
     
     def getRoom(self, id):
-        mycursor = self.dbp.cursor()
-        sql = "SELECT * FROM rooms where id=%s"
-        mycursor.execute(sql, (id,))
-        data = mycursor.fetchone()
-        
-        if room != None:
-            data = room(data[0], data[1], data[2], data[3], data[4])
-        
-        self.dbp.commit()
-        return data
+        if not self.dbp: return None
+        data = self.dbp.table("rooms").select("*").eq("id", id).execute()
+        if len(data.data) == 0: return None
+        row = data.data[0]
+        return room(row['id'], row['user_id'], row['enemigo_id'], row['nombre'], row['estado'])
     
-    def updateRoom(self, room):
-        mycursor = self.dbp.cursor()
-        sql = "UPDATE rooms SET user_id = %s, enemigo_id = %s, nombre = %s , estado = %s WHERE id = %s"
-        val = (room.user_id, room.enemigo_id, room.nombre, room.estado, room.id)
-        mycursor.execute(sql, val)
-        self.dbp.commit()
+    def updateRoom(self, r):
+        if not self.dbp: return None
+        val = {
+            "user_id": r.user_id,
+            "enemigo_id": r.enemigo_id,
+            "nombre": r.nombre,
+            "estado": r.estado
+        }
+        self.dbp.table("rooms").update(val).eq("id", r.id).execute()
