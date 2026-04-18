@@ -17,3 +17,9 @@ class teamCS:
         if not self.dbp: return False
         res = self.dbp.table("teams").update({"vida": nueva_vida}).eq("id", team_id).execute()
         return len(res.data) > 0
+
+    def changeActive(self, old_id, new_id):
+        if not self.dbp: return False
+        self.dbp.table("teams").update({"active": False}).eq("id", old_id).execute()
+        self.dbp.table("teams").update({"active": True}).eq("id", new_id).execute()
+        return True

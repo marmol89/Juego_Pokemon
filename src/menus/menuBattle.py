@@ -71,3 +71,21 @@ class menuBattle:
         os.system('cls')
         print(f"{user.username} ha sido derrotado por {enemy.username}.")
         time.sleep(2)
+
+    def cambiarPokemon(self, teamList):
+        vivos = [t for t in teamList if t.vida > 0]
+        if not vivos: return None
+        
+        while True:
+            os.system('cls')
+            print("¡Tu Pokémon ha sido debilitado! Elige a tu siguiente Pokémon:")
+            for i, t in enumerate(vivos):
+                pokemon = t.pokemon()
+                print(f"{i+1} - {pokemon.nombre} (HP: {t.vida}/{pokemon.puntos_de_salud})")
+                
+            try:
+                opcion = int(input("Option: "))
+                if 1 <= opcion <= len(vivos):
+                    return vivos[opcion - 1]
+            except:
+                pass

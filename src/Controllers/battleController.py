@@ -23,8 +23,13 @@ class battleController:
             self.updateTeams()
             activeUserTeam = next((t for t in self.userTeam if t.active), self.userTeam[0])
             activeEnemyTeam = next((t for t in self.enemyTeam if t.active), self.enemyTeam[0])
-            userPokemon = self.room.pokemonActivoUser()
-            enemyPokemon = self.room.pokemonActivoEnemigo()
+            
+            if self.user.id == self.room.user_id:
+                userPokemon = self.room.pokemonActivoUser()
+                enemyPokemon = self.room.pokemonActivoEnemigo()
+            else:
+                userPokemon = self.room.pokemonActivoEnemigo()
+                enemyPokemon = self.room.pokemonActivoUser()
             
             move = menuBattle(self.room).combate(self.user, self.enemy, self.userTeam, self.enemyTeam)
             movCS.insertMovement(self.room.id, userPokemon.id, move['nombre'], json.dumps(move))
@@ -70,18 +75,31 @@ class battleController:
             if my_move_row:
                 movCS.deleteMovement(my_move_row['id'])
             time.sleep(1.5)
+            
+            if activeUserTeam.vida <= 0:
+                userAlives = [t for t in self.userTeam if t.vida > 0]
+                if not userAlives:
+                    break
+                new_active = menuBattle(self.room).cambiarPokemon(self.userTeam)
+                teamdb.changeActive(activeUserTeam.id, new_active.id)
+                time.sleep(2)
+            
+            if activeEnemyTeam.vida <= 0:
+                enemyAlives = [t for t in self.enemyTeam if t.vida > 0]
+                if not enemyAlives:
+                    break
+                print("\nEsperando a que el rival elija su próximo Pokémon...")
+                while True:
+                    self.updateTeams()
+                    newEnemy = next((t for t in self.enemyTeam if t.active), None)
+                    if newEnemy and newEnemy.vida > 0:
+                        break
+                    time.sleep(1.5)
 
-        
-        if (self.room.isVidaTeamEnemigo()):
-            self.battle.winner_id = self.enemy.id
-            self.battle.loser_id = self.user.id
-            self.battle.save()
+        if activeUserTeam.vida <= 0:
             menuBattle(self.room).derrota(self.user, self.enemy, self.userTeam, self.enemyTeam)
             self.cleanUp()
-        elif (self.room.isVidaTeamUser()):
-            self.battle.winner_id = self.user.id
-            self.battle.loser_id = self.enemy.id
-            self.battle.save()
+        elif activeEnemyTeam.vida <= 0:
             menuBattle(self.room).victoria(self.user, self.enemy, self.userTeam, self.enemyTeam)
             self.cleanUp()
 
