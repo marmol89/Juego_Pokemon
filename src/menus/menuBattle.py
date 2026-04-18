@@ -8,21 +8,28 @@ class menuBattle:
         os.system('cls')
     
     def inicio(self, user, enemy):
-        print("Inicio battalla")
-        print(user.username + " vs " + enemy.username)
+        print(f"{'='*70}")
+        print(f"{'¡LA BATALLA COMIENZA!':^70}")
+        print(f"{'='*70}")
+        print(f"\n{user.username:^30} {'VS':^10} {enemy.username:^30}\n")
+        print(f"{'='*70}")
         time.sleep(2)
 
     def presentacionPokemons(self, user, enemy, userTeam, enemyTeam):
         os.system('cls')
-        print(f"═══{'-'*len(user.username)}───Pokemon───{'-'*len(enemy.username)}═══")
-        print(f" {user.username:^{len(user.username)+21}} vs {enemy.username:^{len(enemy.username)+21}} ")
-        print(f" {'':^{len(user.username)+21}} {'':^{len(enemy.username)+21}} ")
+        print(f"{'='*70}")
+        print(f"{'PRESENTACIÓN DE EQUIPOS':^70}")
+        print(f"{'='*70}\n")
+        print(f" {user.username:^30} {'':^10} {enemy.username:^30}")
+        print(f" {'-'*30:^30} {'':^10} {'-'*30:^30} ")
         
-        for userPokemon, enemyPokemon in zip(userTeam, enemyTeam):
-            print(f" {userPokemon.pokemon().nombre:^{len(user.username)+21}} vs {enemyPokemon.pokemon().nombre:^{len(enemy.username)+21}} ")
+        for userTeamObj, enemyTeamObj in zip(userTeam, enemyTeam):
+            u_name = userTeamObj.pokemon().nombre.upper()
+            e_name = enemyTeamObj.pokemon().nombre.upper()
+            print(f" {u_name:^30} {'vs':^10} {e_name:^30} ")
         
-        print(f"══{'-'*len(user.username)}───Pokemon───{'-'*len(enemy.username)}═══")
-        time.sleep(2)
+        print(f"\n{'='*70}")
+        time.sleep(3)
 
     def combate(self, user, enemy , userTeam, enemyTeam):
         os.system('cls')
