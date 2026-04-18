@@ -1,6 +1,7 @@
 import time
 import json
 from src.menus.menuBattle import menuBattle
+from src.utils.visuals import type_text, animate_hp_bar, shake_screen
 class battleController:
     def __init__(self, room, user):
         self.room = room
@@ -83,12 +84,16 @@ class battleController:
                 
                 if m.get("tipo_accion") == "use_item":
                     # Aplicar item
-                    print(f"\n{p['user'].username} usa {m['nombre']}!")
+                    type_text(f"\n{p['user'].username} usa {m['nombre']}!")
                     efecto = m.get("efecto_item", {})
                     if "cura" in efecto:
                         cura = efecto["cura"]
+                        vida_antes = t.vida
                         t.vida = min(pok.puntos_de_salud, t.vida + cura)
-                        print(f"¡{pok.nombre} recupera vida!")
+                        
+                        prefix = f"   {pok.nombre}: "
+                        animate_hp_bar(vida_antes, t.vida, pok.puntos_de_salud, prefix=prefix)
+                        type_text(f"¡{pok.nombre} recupera vida!")
                     
                     # Consumir de la DB (solo si lo usó el usuario actual localmente)
                     if p["is_user"]:
@@ -107,11 +112,20 @@ class battleController:
                     
                     if def_team.vida <= 0: continue
 
-                    print(f"\n{p['user'].username} usa {m['nombre']}!")
+                    type_text(f"\n{p['user'].username} usa {m['nombre']}!")
                     dmg = max(1, int((pok.ataque / def_pok.defensa) * m['poder'] * 0.5))
-                    def_team.vida -= dmg
-                    print(f"Causa {dmg} puntos de daño a {def_pok.nombre}.")
-                    time.sleep(2)
+                    
+                    vida_antes = def_team.vida
+                    def_team.vida = max(0, def_team.vida - dmg)
+                    
+                    # Si el daño es alto, sacudimos la pantalla
+                    if dmg > (def_pok.puntos_de_salud * 0.2):
+                        shake_screen()
+                        
+                    prefix = f"   {def_pok.nombre}: "
+                    animate_hp_bar(vida_antes, def_team.vida, def_pok.puntos_de_salud, prefix=prefix)
+                    type_text(f"¡Causa {dmg} puntos de daño a {def_pok.nombre}!")
+                    time.sleep(1)
             
             teamdb.updateVida(activeUserTeam.id, activeUserTeam.vida)
             
