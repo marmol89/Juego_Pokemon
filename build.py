@@ -17,6 +17,9 @@ def build():
     if not os.path.exists(icon_file):
         icon_file = "icon.png" # Fallback a png si no hay conversor
         
+    # Separador de rutas para PyInstaller (';' en Windows, ':' en Unix)
+    sep = os.pathsep
+    
     # Comando base de PyInstaller
     cmd = [
         sys.executable,
