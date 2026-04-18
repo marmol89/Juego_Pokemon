@@ -1,12 +1,26 @@
+import json
+
 class pokemon:
     def __init__(self, id , nombre, tipos, movimientos, EVs, puntos_de_salud):
         self._id = id
         self._nombre = nombre
+        
+        # Robust parsing for JSON fields
+        if isinstance(tipos, str):
+            try: tipos = json.loads(tipos)
+            except: tipos = []
+        if isinstance(movimientos, str):
+            try: movimientos = json.loads(movimientos)
+            except: movimientos = []
+        if isinstance(EVs, str):
+            try: EVs = json.loads(EVs)
+            except: EVs = {"ataque": 50, "defensa": 50, "velocidad": 50}
+            
         self._tipos = tipos
         self._movimientos = movimientos
-        self._ataque = EVs['ataque']
-        self._defensa = EVs['defensa']
-        self._velocidad = EVs['velocidad']
+        self._ataque = EVs.get('ataque', 50)
+        self._defensa = EVs.get('defensa', 50)
+        self._velocidad = EVs.get('velocidad', 50)
         self._puntos_de_salud = puntos_de_salud
     
     @property

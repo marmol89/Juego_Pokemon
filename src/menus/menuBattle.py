@@ -48,8 +48,6 @@ class menuBattle:
         
         print("\n  ¿Qué movimiento quieres usar?\n")
         movimientos = userPokemon.movimientos
-        if isinstance(movimientos, str):
-            movimientos = json.loads(movimientos)
             
         for i, mov in enumerate(movimientos):
             print(f"   [{i+1}] {mov['nombre'][:15]:<15} (Poder: {mov['poder']:>3} | Tipo: {mov['tipo']})")

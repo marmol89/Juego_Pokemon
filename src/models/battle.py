@@ -14,19 +14,23 @@ class battle:
     
     def userTeam(self):
         teamdb = teams()
-        ids = json.loads(self.user_team_ids)
-        teams = []
+        ids = self.user_team_ids
+        if isinstance(ids, str):
+            ids = json.loads(ids)
+        teams_list = []
         for id in ids:
-            teams.append(teamdb.getTeam(id))
-        return teams
+            teams_list.append(teamdb.getTeam(id))
+        return teams_list
     
     def enemyTeam(self):
         teamdb = teams()
-        ids = json.loads(self.enemy_team_ids)
-        teams = []
+        ids = self.enemy_team_ids
+        if isinstance(ids, str):
+            ids = json.loads(ids)
+        teams_list = []
         for id in ids:
-            teams.append(teamdb.getTeam(id))
-        return teams
+            teams_list.append(teamdb.getTeam(id))
+        return teams_list
     
     def getUser(self):
         battlesdb = battles()
