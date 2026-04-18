@@ -26,8 +26,9 @@ class menuBattle:
 
     def combate(self, user, enemy , userTeam, enemyTeam):
         os.system('cls')
-        userPokemon = self.room.pokemonActivoUser()
-        enemyPokemon = self.room.pokemonActivoEnemigo()
+        userPokemon = self.room.getMyActivePokemon(user.id)
+        enemyPokemon = self.room.getTheirActivePokemon(user.id)
+            
         activeUserTeam = next((t for t in userTeam if t.active), userTeam[0])
         activeEnemyTeam = next((t for t in enemyTeam if t.active), enemyTeam[0])
         userVida = max(0, activeUserTeam.vida)

@@ -74,3 +74,18 @@ class room:
     def pokemonActivoEnemigo(self):
         roomsdb = roomCS()
         return roomsdb.pokemonActivo(self._id, self._enemigo_id)
+
+    def getMyTeam(self, current_user_id):
+        return self.getUserTeam() if current_user_id == self._user_id else self.getEnemigoTeam()
+        
+    def getTheirTeam(self, current_user_id):
+        return self.getEnemigoTeam() if current_user_id == self._user_id else self.getUserTeam()
+        
+    def getTheirUser(self, current_user_id):
+        return self.getEnemigo() if current_user_id == self._user_id else self.getUser()
+
+    def getMyActivePokemon(self, current_user_id):
+        return self.pokemonActivoUser() if current_user_id == self._user_id else self.pokemonActivoEnemigo()
+        
+    def getTheirActivePokemon(self, current_user_id):
+        return self.pokemonActivoEnemigo() if current_user_id == self._user_id else self.pokemonActivoUser()

@@ -113,11 +113,6 @@ class battleController:
             
 
     def updateTeams(self):
-        if (self.user.id == self.room.user_id):
-            self.userTeam = self.room.getUserTeam()
-            self.enemyTeam = self.room.getEnemigoTeam()
-            self.enemy = self.room.getEnemigo()
-        if (self.user.id == self.room.enemigo_id):
-            self.userTeam = self.room.getEnemigoTeam()
-            self.enemyTeam = self.room.getUserTeam()
-            self.enemy = self.room.getUser()
+        self.userTeam = self.room.getMyTeam(self.user.id)
+        self.enemyTeam = self.room.getTheirTeam(self.user.id)
+        self.enemy = self.room.getTheirUser(self.user.id)
