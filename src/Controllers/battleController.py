@@ -8,11 +8,15 @@ class battleController:
         self.updateTeams()
     
     def inicio(self):
+        if not self.battle:
+            return
         menuBattle(self.room).inicio(self.user, self.enemy)
         menuBattle(self.room).presentacionPokemons(self.user, self.enemy, self.userTeam, self.enemyTeam)
         self.combate()
 
     def combate(self):
+        if not self.battle:
+            return
         from src.Consultas.movementCS import movementCS
         from src.Consultas.teamCS import teamCS
         import json

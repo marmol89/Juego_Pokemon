@@ -33,11 +33,19 @@ class teamController:
 
         while True:
             battle = self.room.getBattle()
+            if battle is None:
+                break
+                
             if(battle.enemy_team_ids != None and battle.user_team_ids != None):
                     battleController(self.room, self.user).inicio()
+                    # Salir del bucle una vez termina la batalla
+                    break
             
             if(battle.winner_id != None and battle.loser_id != None):
                 break
+            
+            import time
+            time.sleep(1)
 
 
 
