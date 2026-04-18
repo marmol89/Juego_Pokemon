@@ -33,24 +33,30 @@ class menuBattle:
         userVida = max(0, activeUserTeam.vida)
         enemyVida = max(0, activeEnemyTeam.vida)
         
-        print(f"{'='*30} Pokémon {'='*30}")
-        print(f"{userPokemon.nombre:^30} {'vs':^10} {enemyPokemon.nombre:^30}")
-        print(f"{'':^30} {'':^10} {'':^30}")
-        print(f"HP: {userVida}/{userPokemon.puntos_de_salud} {'':^10} HP: {enemyVida}/{enemyPokemon.puntos_de_salud}")
-        print(f"[{'#' * (int(userVida / userPokemon.puntos_de_salud * 10)):<10}] {'':^10} [{'#' * (int(enemyVida / enemyPokemon.puntos_de_salud * 10)):<10}]")
-        print(f"{'='*30}{'='*10}{'='*30}")
+        print(f"{'='*70}")
+        print(f"{userPokemon.nombre:^30} {'VS':^10} {enemyPokemon.nombre:^30}")
         
-        print("\n¿Qué movimiento quieres usar?")
+        hp_user_str = f"HP: {userVida}/{userPokemon.puntos_de_salud}"
+        hp_enemy_str = f"HP: {enemyVida}/{enemyPokemon.puntos_de_salud}"
+        print(f"{hp_user_str:^30} {'':^10} {hp_enemy_str:^30}")
+        
+        bar_user = '[' + '#' * (int(userVida / userPokemon.puntos_de_salud * 10)) + ' ' * (10 - int(userVida / userPokemon.puntos_de_salud * 10)) + ']'
+        bar_enemy = '[' + '#' * (int(enemyVida / enemyPokemon.puntos_de_salud * 10)) + ' ' * (10 - int(enemyVida / enemyPokemon.puntos_de_salud * 10)) + ']'
+        print(f"{bar_user:^30} {'':^10} {bar_enemy:^30}")
+        print(f"{'='*70}")
+        
+        print("\n  ¿Qué movimiento quieres usar?\n")
         movimientos = userPokemon.movimientos
         if isinstance(movimientos, str):
             movimientos = json.loads(movimientos)
             
         for i, mov in enumerate(movimientos):
-            print(f"{i+1} - {mov['nombre']} (Poder: {mov['poder']} | Tipo: {mov['tipo']})")
+            print(f"   [{i+1}] {mov['nombre'][:15]:<15} (Poder: {mov['poder']:>3} | Tipo: {mov['tipo']})")
         
+        print()
         while True:
             try:
-                opcion = int(input("Option: "))
+                opcion = int(input("  Elige una opción: "))
                 if 1 <= opcion <= len(movimientos):
                     return movimientos[opcion - 1]
             except:
@@ -78,13 +84,17 @@ class menuBattle:
         
         while True:
             os.system('cls')
-            print("¡Tu Pokémon ha sido debilitado! Elige a tu siguiente Pokémon:")
+            print(f"{'='*70}")
+            print(f"{'¡TU POKÉMON HA SIDO DEBILITADO!':^70}")
+            print(f"{'='*70}\n")
+            print("  Elige a tu siguiente compañero:\n")
             for i, t in enumerate(vivos):
                 pokemon = t.pokemon()
-                print(f"{i+1} - {pokemon.nombre} (HP: {t.vida}/{pokemon.puntos_de_salud})")
+                print(f"   [{i+1}] {pokemon.nombre:<15} (HP: {t.vida}/{pokemon.puntos_de_salud})")
                 
+            print(f"\n{'='*70}")
             try:
-                opcion = int(input("Option: "))
+                opcion = int(input("   Elige una opción: "))
                 if 1 <= opcion <= len(vivos):
                     return vivos[opcion - 1]
             except:

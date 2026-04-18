@@ -15,15 +15,16 @@ class menuLogin:
         os.system('cls')
     
     def inicio(self):
-        print("-----POKEMONE MENU-----")
-        print("-----BIENVENIDO "+ self.user.username.upper() +"-----")
-        print("")
-        print("Options: ")
-        print("1 - Crear Sala")
-        print("2 - Unirte a una sala")
-        print("0 - Log out")
-        print("")
-        optionI = input("Option: ")
+        print(f"{'='*50}")
+        print(f"{'MENÚ PRINCIPAL':^50}")
+        print(f"{'='*50}")
+        print(f"{'¡Bienvenido, ' + self.user.username.upper() + '!':^50}\n")
+        print("  Opciones:")
+        print("    [1] Crear Sala")
+        print("    [2] Unirte a una Sala")
+        print("    [0] Cerrar Sesión\n")
+        print(f"{'='*50}")
+        optionI = input("  Elige una opción: ")
 
         if optionI == '0':
             os.system('cls')
@@ -42,14 +43,14 @@ class menuLogin:
     
     def createRoom(self):
         self.roomcr.user = self.user
-        print("-----POKEMONE MENU-----")
-        print("-----CREACION SALA-----")
-        print("")
-        name = input("Nombre Sala: ")
+        print(f"{'='*50}")
+        print(f"{'CREAR SALA':^50}")
+        print(f"{'='*50}\n")
+        name = input("  Nombre de la Sala: ")
         self.roomsdb.createRoom(self.user.id, name)
         # Crear la batalla
         os.system('cls')
-        print("Sala creada")
+        print("\n  [+] Sala creada con éxito")
         time.sleep(2)
         room = self.roomsdb.getRoomUserActiva(self.user.id)
         self.battlesdb.createBattle(room.id)
@@ -61,16 +62,15 @@ class menuLogin:
         salas = self.roomsdb.getRoomActivos()
         if len(salas) == 0:
             while len(salas) == 0:
-                print("-----POKEMONE MENU-----")
-                print("-----LISTA SALAS-----")
-                print("")
-                print("No hay salas disponibles")
-                print("")
-                print("Options : ")
-                print("1 - Refrescar")
-                print("2 - salir")
-                print("")
-                option = input("Option:")
+                print(f"{'='*50}")
+                print(f"{'LISTA DE SALAS':^50}")
+                print(f"{'='*50}\n")
+                print("  [!] No hay salas disponibles\n")
+                print("  Opciones:")
+                print("    [1] Refrescar")
+                print("    [2] Salir\n")
+                print(f"{'='*50}")
+                option = input("  Elige una opción: ")
                 if option == "2":
                     break
                 salas = self.roomsdb.getRoomActivos()
@@ -79,18 +79,18 @@ class menuLogin:
         if len(salas) > 0:
             option = "0"
             while option == "0":
-                print("-----POKEMONE MENU-----")
-                print("-----LISTA SALAS-----")
-                print("")
+                print(f"{'='*50}")
+                print(f"{'SALAS DISPONIBLES':^50}")
+                print(f"{'='*50}\n")
                 num = 0
                 for sala in salas:
                     num += 1
-                    print(str(num) + " - " + sala.nombre)
+                    print(f"  [{num}] - {sala.nombre}")
                 
-                print("0 - Refrescar")
-                print("-1 - salir")
-                print("")
-                option = input("Option:")
+                print("\n  [0] Refrescar")
+                print("  [-1] Salir\n")
+                print(f"{'='*50}")
+                option = input("  Elige una sala: ")
 
                 if option == "-1":
                     break
@@ -103,9 +103,3 @@ class menuLogin:
                 os.system('cls')
         
         os.system('cls')
-
-
-            
-        
-
-
