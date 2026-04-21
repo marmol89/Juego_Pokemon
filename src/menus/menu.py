@@ -1,13 +1,14 @@
 import os
 import time
 from src.database.users import users
+from src.utils.clear_screen import clear_screen
 
 class menu:
-    logut = False
+    logout = False
     user = None
 
     def __init__(self):
-        os.system('cls')
+        clear_screen()
 
     def inicio(self):
         print(f"{'='*50}")
@@ -22,18 +23,18 @@ class menu:
         option = get_key()
         
         if option == '1':
-            os.system('cls')
+            clear_screen()
             self.login()
             
 
         if option == '2':
-            os.system('cls')
+            clear_screen()
             self.register()
          
         if option == '0':
-            self.logut = True
+            self.logout = True
 
-        os.system('cls')
+        clear_screen()
 
     def login(self):
         usersdb = users()

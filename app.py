@@ -15,7 +15,7 @@ equipoE = []
 pokemons = pokemonDB.getPokemons()
 
 while True:
-    if menu.logut:
+    if menu.logout:
         break
 
     if menu.user is not None:
@@ -28,4 +28,4 @@ while True:
         menu.inicio()
 
 
-
+

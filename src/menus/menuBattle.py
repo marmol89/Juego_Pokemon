@@ -1,11 +1,11 @@
-import os
 import time
 import json
+from src.utils.clear_screen import clear_screen
 
 class menuBattle:
     def __init__(self , room):
         self.room = room
-        os.system('cls')
+        clear_screen()
     
     def inicio(self, user, enemy):
         print(f"{'='*70}")
@@ -16,7 +16,7 @@ class menuBattle:
         time.sleep(2)
 
     def presentacionPokemons(self, user, enemy, userTeam, enemyTeam):
-        os.system('cls')
+        clear_screen()
         print(f"{'='*70}")
         print(f"{'PRESENTACIÓN DE EQUIPOS':^70}")
         print(f"{'='*70}\n")
@@ -32,7 +32,7 @@ class menuBattle:
         time.sleep(3)
 
     def combate(self, user, enemy , userTeam, enemyTeam, items_used=0):
-        os.system('cls')
+        clear_screen()
         userPokemon = self.room.getMyActivePokemon(user.id)
         enemyPokemon = self.room.getTheirActivePokemon(user.id)
             
@@ -114,17 +114,17 @@ class menuBattle:
     
 
     def vida(self, user, enemy , userTeam, enemyTeam):
-        os.system('cls')
+        clear_screen()
         print("------------------------")
         time.sleep(5)
     
     def victoria(self, user, enemy , userTeam, enemyTeam):
-        os.system('cls')
+        clear_screen()
         print(f"¡{user.username} ha ganado la batalla!")
         time.sleep(2)
 
     def derrota(self, user, enemy , userTeam, enemyTeam):
-        os.system('cls')
+        clear_screen()
         print(f"{user.username} ha sido derrotado por {enemy.username}.")
         time.sleep(2)
 
@@ -134,7 +134,7 @@ class menuBattle:
         if not vivos: return None
         
         while True:
-            os.system('cls')
+            clear_screen()
             print(f"{'='*70}")
             print(f"{'¡TU POKÉMON HA SIDO DEBILITADO!':^70}")
             print(f"{'='*70}\n")
@@ -174,7 +174,7 @@ class menuBattle:
         inventory = items().getUserItems(user_id)
         
         while True:
-            os.system('cls')
+            clear_screen()
             print(f"{'='*70}")
             print(f"{'MOCHILA ' + f'({items_used}/5)':^70}")
             print(f"{'='*70}\n")
