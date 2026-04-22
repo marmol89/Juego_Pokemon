@@ -435,3 +435,38 @@ class MatchmakingDAO:
             return 0
         finally:
             conn.close()
+
+    def get_pending_room(self, user_id: str) -> Optional[Tuple[int, int, str, int]]:
+        """
+        Find a room where the given user is the enemigo_id.
+        This handles the case where another player matched us but our queue entry
+        wasn't updated due to a transaction rollback.
+
+        Args:
+            user_id: The user ID to find rooms for
+
+        Returns:
+            Room model if found, None otherwise
+        """
+        conn = self._get_connection()
+        try:
+            cursor = conn.cursor()
+            cursor.execute(
+                """
+                SELECT id, user_id, enemigo_id, nombre, estado
+                FROM rooms
+                WHERE enemigo_id = %s AND estado = 2
+                LIMIT 1
+                """,
+                (user_id,)
+            )
+            result = cursor.fetchone()
+            conn.close()
+            if result:
+                from src.models.room import room as RoomModel
+                return RoomModel(result[0], result[1], result[2], result[3], result[4])
+            return None
+        except Exception as e:
+            conn.close()
+            print(f"[MatchmakingDAO] get_pending_room error: {e}")
+            return None

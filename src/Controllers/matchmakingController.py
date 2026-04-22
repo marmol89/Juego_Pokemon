@@ -111,14 +111,27 @@ class MatchmakingController:
     def get_status(self, user) -> Optional[object]:
         """
         Get the current matchmaking status for a user.
-        
+
         Args:
             user: Logged-in user object
-            
+
         Returns:
             MatchmakingQueue entry if exists, None otherwise
         """
         return self.dao.get_status(str(user.id))
+
+    def get_pending_room_for_user(self, user_id: str) -> Optional[object]:
+        """
+        Find a room where this user is the enemigo_id (matched by another player's search).
+        Used when our queue entry doesn't have room_id set but another player matched us.
+
+        Args:
+            user_id: The user ID
+
+        Returns:
+            Room object if found, None otherwise
+        """
+        return self.dao.get_pending_room(user_id)
     
     def is_in_queue(self, user) -> bool:
         """Check if user is currently in the matchmaking queue."""

@@ -189,9 +189,21 @@ class menuLogin:
                 return
 
             # Also check if we were already matched by another player's try_match
+            # (our queue entry might have room_id set by another player's find_match)
             status = self.matchmaking.get_status(self.user)
             if status and status.room_id:
                 room_id = int(status.room_id)
+                print(f"\n\n  [!] ¡Partida encontrada! Room ID: {room_id}")
+                print("  Presiona cualquier tecla para continuar...")
+                get_key()
+                # Transition to combat
+                self._enter_match_combat(room_id)
+                return
+
+            # Check if there's a room waiting for us where we are the enemy
+            pending_room = self.matchmaking.get_pending_room_for_user(self.user.id)
+            if pending_room:
+                room_id = int(pending_room.id)
                 print(f"\n\n  [!] ¡Partida encontrada! Room ID: {room_id}")
                 print("  Presiona cualquier tecla para continuar...")
                 get_key()
