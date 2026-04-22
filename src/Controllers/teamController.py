@@ -16,6 +16,7 @@ class teamController:
         global_team = self.teamdb.getGlobalTeam(self.user.id)
 
         if global_team:
+            print(f"  [DEBUG teamController] Using global team for user {self.user.id}")
             # Copy global team to this room with correct room_id
             self.teamdb.copyGlobalTeamToRoom(self.user.id, self.room.id)
             # Get the newly created team entries for this room
@@ -24,6 +25,7 @@ class teamController:
             teams = teamsdb.getTeamByRoomAndUser(self.room.id, self.user.id)
         else:
             # No global team, show team selection UI
+            print(f"  [DEBUG teamController] No global team, showing selection UI for user {self.user.id}")
             teams = self.menu.selecionar(self.user)
             for team in teams:
                 self.teamdb.createTeam(team)

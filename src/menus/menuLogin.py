@@ -233,8 +233,12 @@ class menuLogin:
     def _enter_match_combat(self, room_id):
         """Transition to combat after a match is found."""
         from src.Controllers.roomController import roomController
+        print(f"\n  [DEBUG] Entering match combat, room_id={room_id}")
         room = self.roomsdb.getRoom(room_id)
         if room:
+            print(f"  [DEBUG] Room found: estado={room.estado}, user_id={room.user_id}, enemigo_id={room.enemigo_id}")
             self.roomcr.user = self.user
             self.roomcr.combrobarRoomEspera(room)
+        else:
+            print(f"  [DEBUG] Room not found for room_id={room_id}")
         clear_screen()
