@@ -1,6 +1,5 @@
 from typing import Optional, Tuple
 import psycopg2
-from psycopg2.extensions import IsolationLevel
 from src.database.db import db
 from src.models.matchmaking_queue import MatchmakingQueue
 
