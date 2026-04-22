@@ -69,7 +69,7 @@ class MatchmakingRealtime:
             self.channels[user_id] = channel
             
         except Exception as e:
-            print(f"[MatchmakingRealtime] Subscribe error for {user_id}: {e}")
+            # Realtime not available in sync client (Supabase Realtime requires async)
             self.channels[user_id] = None
     
     def _make_handler(self, user_id: str, event_type: str) -> Callable:
