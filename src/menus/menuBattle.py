@@ -21,15 +21,22 @@ class menuBattle:
         print(f"{'='*70}")
         print(f"{'PRESENTACIÓN DE EQUIPOS':^70}")
         print(f"{'='*70}\n")
-        print(f" {user.username:^30} {'':^10} {enemy.username:^30}")
-        print(f" {'-'*30:^30} {'':^10} {'-'*30:^30} ")
-        
+
+        # Header row con nombres
+        username_width = 28
+        print(f"  {user.username:<{username_width}}               {enemy.username:>{username_width}}")
+
+        # Encabezados de columnas
+        sep = "  " + "-"*username_width + "         " + "-"*username_width
+        print(sep)
+
         for userTeamObj, enemyTeamObj in zip(userTeam, enemyTeam):
             u_name = userTeamObj.pokemon().nombre.upper()
             e_name = enemyTeamObj.pokemon().nombre.upper()
-            print(f" {u_name:^30} {'vs':^10} {e_name:^30} ")
-        
-        print(f"\n{'='*70}")
+            print(f"  {u_name:<{username_width}}    vs    {e_name:>{username_width}}")
+
+        print()
+        print(f"{'='*70}")
         time.sleep(3)
 
     def combate(self, user, enemy, userTeam, enemyTeam, items_used=0):

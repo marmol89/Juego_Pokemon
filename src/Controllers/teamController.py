@@ -36,7 +36,7 @@ class teamController:
             if battle is None:
                 break
                 
-            if(battle.enemy_team_ids != None and battle.user_team_ids != None):
+            if(battle.enemy_team_ids and battle.user_team_ids):
                     battleController(self.room, self.user).inicio()
                     # Salir del bucle una vez termina la batalla
                     break

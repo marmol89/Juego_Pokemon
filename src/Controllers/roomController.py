@@ -23,9 +23,10 @@ class roomController:
 
             if room.enemigo_id != None and room.estado == 2:
                 self.menuRoom.esperaRoom(3)
+                # Ambos jugadores esperan la selección de equipo del otro
                 teamController(room, self.user).inicio()
                 break
-            
+
             time.sleep(2)
     
     def joinRoom(self, room):

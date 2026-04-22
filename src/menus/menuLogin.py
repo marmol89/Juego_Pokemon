@@ -13,7 +13,7 @@ class menuLogin:
         self.roomcr = roomController()
         self.battlesdb = battles()
         clear_screen()
-    
+
     def inicio(self):
         # Recargar el usuario para tener los puntos al día
         from src.database.users import users
@@ -43,18 +43,15 @@ class menuLogin:
         if optionI == '2':
             clear_screen()
             self.joinRoom()
-        if optionI == '3':
-            clear_screen()
-            self.openShop()
 
     def openShop(self):
         from src.menus.menuShop import menuShop
         menuShop(self.user).mostrar()
-    
+
     def logout(self):
         self.user = None
         clear_screen()
-    
+
     def createRoom(self):
         self.roomcr.user = self.user
         print(f"{'='*50}")
@@ -78,8 +75,12 @@ class menuLogin:
         self.battlesdb.createBattle(room.id)
         self.roomcr.combrobarRoomEspera(room)
         clear_screen()
-    
+
+        self.joinRoom()
+
+    def joinRoom(self):
         from src.utils.visuals import get_key
+        self.roomcr.user = self.user
         salas = self.roomsdb.getRoomActivos()
         while True:
             clear_screen()
@@ -103,7 +104,7 @@ class menuLogin:
                 print(f"{'='*50}\n")
                 for i, sala in enumerate(salas):
                     print(f"  [{i+1}] - {sala.nombre}")
-                
+
                 print("\n  [0] Refrescar")
                 print("  [X] Volver\n")
                 print(f"{'='*50}")
@@ -113,7 +114,7 @@ class menuLogin:
                 if option == '0':
                     salas = self.roomsdb.getRoomActivos()
                     continue
-                
+
                 try:
                     num_opt = int(option)
                     if 1 <= num_opt <= len(salas):
@@ -124,6 +125,4 @@ class menuLogin:
                         break
                 except:
                     pass
-        clear_screen()
-        
         clear_screen()
