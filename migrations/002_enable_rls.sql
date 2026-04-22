@@ -2,14 +2,11 @@
 -- This migration enables RLS on the core game tables
 
 -- Enable RLS on game tables
--- NOTE: Disabled for teams, battles, movements, user_items due to custom auth
--- (auth.uid() returns UUID, incompatible with INTEGER user_id in this project)
-ALTER TABLE rooms ENABLE ROW LEVEL SECURITY;
--- Disable RLS on tables using custom auth (auth.uid() is UUID, user_id is INTEGER)
-ALTER TABLE teams DISABLE ROW LEVEL SECURITY;
-ALTER TABLE battles DISABLE ROW LEVEL SECURITY;
-ALTER TABLE movements DISABLE ROW LEVEL SECURITY;
-ALTER TABLE user_items DISABLE ROW LEVEL SECURITY;
+-- NOTE: All RLS disabled - project uses custom auth (bcrypt), not Supabase Auth
+-- auth.uid() returns UUID which is incompatible with INTEGER user_id in this project
+-- Using application-level authorization instead
+-- ALTER TABLE rooms ENABLE ROW LEVEL SECURITY;
+ALTER TABLE rooms DISABLE ROW LEVEL SECURITY;
 
 -- Policy: Users can only see/modify their own rooms
 -- NOTE: auth.uid() returns UUID but user_id is INTEGER (custom auth)
@@ -18,34 +15,8 @@ ALTER TABLE user_items DISABLE ROW LEVEL SECURITY;
 --     USING (user_id = auth.uid())
 --     WITH CHECK (user_id = auth.uid());
 
--- Policy: Users can only see/modify their own teams
--- NOTE: Using custom auth, auth.uid() not applicable
--- CREATE POLICY "users_own_teams" ON teams FOR ALL
---     USING (user_id = auth.uid())
---     WITH CHECK (user_id = auth.uid());
-
--- Policy: Users can only see/modify battles they participated in
--- NOTE: Using custom auth, auth.uid() not applicable
--- CREATE POLICY "users_own_battles" ON battles FOR ALL
---     USING (winner_id = auth.uid() OR loser_id = auth.uid())
---     WITH CHECK (winner_id = auth.uid() OR loser_id = auth.uid());
-
--- Policy: Users can only see/modify movements in their battles
--- NOTE: Using custom auth, auth.uid() not applicable
--- CREATE POLICY "users_own_movements" ON movements FOR ALL
---     USING ( EXISTS (
---         SELECT 1 FROM rooms
---         WHERE rooms.id = movements.room_id
---         AND (rooms.user_id = auth.uid() OR rooms.enemigo_id = auth.uid())
---     ))
---     WITH CHECK ( EXISTS (
---         SELECT 1 FROM rooms
---         WHERE rooms.id = movements.room_id
---         AND (rooms.user_id = auth.uid() OR rooms.enemigo_id = auth.uid())
---     ));
-
--- Policy: Users can only see/modify their own user_items
--- NOTE: Using custom auth, auth.uid() not applicable
--- CREATE POLICY "users_own_user_items" ON user_items FOR ALL
---     USING (user_id = auth.uid())
---     WITH CHECK (user_id = auth.uid());
+-- Disable RLS on remaining tables
+ALTER TABLE teams DISABLE ROW LEVEL SECURITY;
+ALTER TABLE battles DISABLE ROW LEVEL SECURITY;
+ALTER TABLE movements DISABLE ROW LEVEL SECURITY;
+ALTER TABLE user_items DISABLE ROW LEVEL SECURITY;
