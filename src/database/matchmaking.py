@@ -189,39 +189,52 @@ class MatchmakingDAO:
             matched_user_id = candidate[0]
             candidate_id = candidate[3]
 
-            # Step 3: Create a new room for the match
-            cursor.execute(
-                """
-                INSERT INTO rooms (user_id, enemigo_id, nombre, estado)
-                VALUES (%s, %s, %s, 2)
-                RETURNING id
-                """,
-                (user_id, matched_user_id, f"Match_{entry_id}_{candidate_id}")
-            )
-            room_id = cursor.fetchone()[0]
+            # Step 3: Only the newer entry (higher ID) creates the room
+            # This prevents both players from creating duplicate rooms
+            if entry_id > candidate_id:
+                cursor.execute(
+                    """
+                    INSERT INTO rooms (user_id, enemigo_id, nombre, estado)
+                    VALUES (%s, %s, %s, 2)
+                    RETURNING id
+                    """,
+                    (user_id, matched_user_id, f"Match_{entry_id}_{candidate_id}")
+                )
+                room_id = cursor.fetchone()[0]
 
-            # Step 4: Update candidate entry to 'matched' with room_id
-            cursor.execute(
-                """
-                UPDATE matchmaking_queue
-                SET status = 'matched', room_id = %s
-                WHERE id = %s
-                """,
-                (room_id, candidate_id)
-            )
+                # Step 4: Update candidate entry to 'matched' with room_id
+                cursor.execute(
+                    """
+                    UPDATE matchmaking_queue
+                    SET status = 'matched', room_id = %s
+                    WHERE id = %s
+                    """,
+                    (room_id, candidate_id)
+                )
 
-            # Step 5: Update new entry to 'matched' with room_id
-            cursor.execute(
-                """
-                UPDATE matchmaking_queue
-                SET status = 'matched', room_id = %s
-                WHERE id = %s
-                """,
-                (room_id, entry_id)
-            )
+                # Step 5: Update new entry to 'matched' with room_id
+                cursor.execute(
+                    """
+                    UPDATE matchmaking_queue
+                    SET status = 'matched', room_id = %s
+                    WHERE id = %s
+                    """,
+                    (room_id, entry_id)
+                )
+            else:
+                # Newer entry already matched by the older one, just update our status
+                cursor.execute(
+                    """
+                    UPDATE matchmaking_queue
+                    SET status = 'matched'
+                    WHERE id = %s
+                    """,
+                    (entry_id,)
+                )
+                room_id = None  # Room was created by the other player
 
             conn.commit()
-            return (matched_user_id, str(room_id))
+            return (matched_user_id, str(room_id)) if room_id else None
 
         except psycopg2.extensions.TransactionRollbackError as e:
             # Serialization conflict - another transaction matched the same candidate
