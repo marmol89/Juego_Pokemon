@@ -166,14 +166,19 @@ class MatchmakingDAO:
                 conn.rollback()
                 return None  # Entry already matched or doesn't exist
 
-            # Step 2: Find the best candidate
+            # Step 2: Find the best candidate (excluding self-entry)
             cursor.execute(
                 """
                 SELECT user_id, rating, entered_at, id
-                FROM find_match_candidates(%s, %s)
+                FROM matchmaking_queue
+                WHERE status = 'waiting'
+                  AND id != %s
+                  AND ABS(rating - %s) <= %s
+                ORDER BY ABS(rating - %s) ASC, entered_at ASC
+                LIMIT 1
                 FOR UPDATE
                 """,
-                (rating, rating_diff_max)
+                (entry_id, rating, rating_diff_max, rating)
             )
             candidate = cursor.fetchone()
 
