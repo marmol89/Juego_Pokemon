@@ -200,7 +200,8 @@ class menuLogin:
                 return
 
             # Check for key press (non-blocking)
-            key = get_key(timeout=1)
+            from src.utils.visuals import get_key_timeout
+            key = get_key_timeout(timeout=1)
             if key and key.lower() == 'c':
                 self.matchmaking.leave_queue(self.user)
                 print("\n  [-] Búsqueda cancelada")
