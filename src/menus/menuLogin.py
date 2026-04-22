@@ -1,8 +1,8 @@
-import os
 import time
 from src.database.rooms import rooms
 from src.Controllers.roomController import roomController
 from src.database.battles import battles
+from src.utils.clear_screen import clear_screen
 
 class menuLogin:
 
@@ -12,7 +12,7 @@ class menuLogin:
         self.roomsdb = rooms()
         self.roomcr = roomController()
         self.battlesdb = battles()
-        os.system('cls')
+        clear_screen()
     
     def inicio(self):
         # Recargar el usuario para tener los puntos al día
@@ -34,26 +34,26 @@ class menuLogin:
         optionI = get_key()
 
         if optionI == '0':
-            os.system('cls')
-            self.logut()
+            clear_screen()
+            self.logout()
 
         if optionI == '1':
-            os.system('cls')
+            clear_screen()
             self.createRoom()
         if optionI == '2':
-            os.system('cls')
+            clear_screen()
             self.joinRoom()
         if optionI == '3':
-            os.system('cls')
+            clear_screen()
             self.openShop()
 
     def openShop(self):
         from src.menus.menuShop import menuShop
         menuShop(self.user).mostrar()
     
-    def logut(self):
+    def logout(self):
         self.user = None
-        os.system('cls')
+        clear_screen()
     
     def createRoom(self):
         self.roomcr.user = self.user
@@ -63,7 +63,7 @@ class menuLogin:
         while True:
             name = input("  Nombre de la Sala (VACÍO para volver): ").strip()
             if not name:
-                os.system('cls')
+                clear_screen()
                 return
             if len(name) > 20:
                 print("  [!] El nombre es demasiado largo (máx 20 caracteres)")
@@ -71,18 +71,18 @@ class menuLogin:
             break
         self.roomsdb.createRoom(self.user.id, name)
         # Crear la batalla
-        os.system('cls')
+        clear_screen()
         print("\n  [+] Sala creada con éxito")
         time.sleep(2)
         room = self.roomsdb.getRoomUserActiva(self.user.id)
         self.battlesdb.createBattle(room.id)
         self.roomcr.combrobarRoomEspera(room)
-        os.system('cls')
+        clear_screen()
     
         from src.utils.visuals import get_key
         salas = self.roomsdb.getRoomActivos()
         while True:
-            os.system('cls')
+            clear_screen()
             if len(salas) == 0:
                 print(f"{'='*50}")
                 print(f"{'LISTA DE SALAS':^50}")
@@ -124,6 +124,6 @@ class menuLogin:
                         break
                 except:
                     pass
-        os.system('cls')
+        clear_screen()
         
-        os.system('cls')
+        clear_screen()

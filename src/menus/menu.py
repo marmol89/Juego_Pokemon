@@ -61,16 +61,16 @@ class menu:
         password = input("  NUEVA CONTRASEÑA: ")
 
         if usersdb.verificarUser(username) == False:
-            os.system('cls')
+            clear_screen()
             print("\n  [!] El usuario ya está registrado")
             time.sleep(2)
-            os.system('cls')
+            clear_screen()
             return
         if usersdb.createUser(username, password):
-            os.system('cls')
+            clear_screen()
             print("\n  [+] Usuario registrado con éxito")
             time.sleep(2)
-            os.system('cls')
-        
+            clear_screen()
+
         self.user = usersdb.login(username, password)
-        os.system('cls')
+        clear_screen()
