@@ -66,6 +66,7 @@ class battleController:
                 }
 
             movCS.insertMovement(self.room.id, userPokemon.id, move['nombre'], json.dumps(move))
+            type_text(f"\n{userPokemon.nombre} usa {move['nombre']}!")
             
             # Usar getLatestMovement para obtener solo el movimiento más reciente
             latest_movs = movCS.getLatestMovements(self.room.id, 2)
@@ -78,6 +79,7 @@ class battleController:
 
             if opponentMove is None:
                 # Seguir esperando si no hay movimiento del oponente
+                type_text("\nEsperando la elección del rival...")
                 while opponentMove is None:
                     latest_movs = movCS.getLatestMovements(self.room.id, 10)
                     for m in latest_movs:
@@ -89,7 +91,7 @@ class battleController:
                         time.sleep(0.5)
             
             # --- DETECTAR RENDICIÓN DEL OPONENTE ---
-            if opponentMove.get("tipo_accion") == "surrender":
+            if opponentMove and opponentMove.get("tipo_accion") == "surrender":
                 type_text("\n¡EL RIVAL SE HA RENDIDO!")
                 # Forzamos victoria rompiendo el bucle con la vida del enemigo en 0 ficticio
                 activeEnemyTeam.vida = 0
