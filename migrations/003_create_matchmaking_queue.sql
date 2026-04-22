@@ -3,6 +3,12 @@
 -- NOTE: Uses INTEGER for user_id/room_id to match custom auth schema (not Supabase Auth UUID)
 
 -- ============================================================================
+-- CLEANUP: Drop old trigger from previous migration version
+-- ============================================================================
+DROP TRIGGER IF EXISTS on_queue_insert ON matchmaking_queue;
+DROP FUNCTION IF EXISTS trigger_find_match();
+
+-- ============================================================================
 -- TABLE: matchmaking_queue
 -- ============================================================================
 CREATE TABLE IF NOT EXISTS matchmaking_queue (

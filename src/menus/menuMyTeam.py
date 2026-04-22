@@ -48,11 +48,11 @@ class menuMyTeam:
                     self._create_team()
 
     def _get_current_team(self):
-        """Get user's current global team (room_id = 0)."""
+        """Get user's current global team (room_id IS NULL)."""
         from src.database.db import db
         try:
             dbp = db().get_connection()
-            data = dbp.table("teams").select("*").eq("user_id", self.user.id).eq("room_id", 0).execute()
+            data = dbp.table("teams").select("*").eq("user_id", self.user.id).is_("room_id", None).execute()
             return [Team(r['id'], r['room_id'], r['user_id'], r['pokemon_id'], r['active'], r['vida'], r['efecto']) for r in data.data]
         except:
             return []
@@ -61,7 +61,7 @@ class menuMyTeam:
         """Delete all global team entries for the user."""
         from src.database.db import db
         dbp = db().get_connection()
-        dbp.table("teams").delete().eq("user_id", self.user.id).eq("room_id", 0).execute()
+        dbp.table("teams").delete().eq("user_id", self.user.id).is_("room_id", None).execute()
 
     def _create_team(self):
         """Create a new global team for the user."""
