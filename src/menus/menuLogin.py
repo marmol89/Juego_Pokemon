@@ -43,6 +43,9 @@ class menuLogin:
         if optionI == '2':
             clear_screen()
             self.joinRoom()
+        if optionI == '3':
+            clear_screen()
+            self.openShop()
 
     def openShop(self):
         from src.menus.menuShop import menuShop

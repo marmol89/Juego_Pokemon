@@ -173,10 +173,10 @@ class menuBattle:
         time.sleep(2)
 
     def cambiarPokemon(self, teamList):
-        from src.utils.visuals import get_key
+        from src.utils.visuals import get_key_timeout
         vivos = [t for t in teamList if t.vida > 0]
         if not vivos: return None
-        
+
         while True:
             clear_screen()
             print(f"{'='*70}")
@@ -186,68 +186,84 @@ class menuBattle:
             for i, t in enumerate(vivos):
                 pokemon = t.pokemon()
                 print(f"   [{i+1}] {pokemon.nombre:<15} (HP: {t.vida}/{pokemon.puntos_de_salud})")
-                
-            print(f"\n{'='*70}")
-            opcion_str = get_key_timeout(timeout=0.5)
-            if opcion_str is None:
-                # Polling para rendición del rival mientras eliges cambio
-                from src.Consultas.movementCS import movementCS
-                movCS = movementCS()
-                opp_poke = self.room.getTheirActivePokemon(self.room.user_id if vivos[0].user_id != self.room.user_id else self.room.enemigo_id)
-                # Nota: room.user_id es el id del creador, no necesariamente el local.
-                # Pero en menuBattle.py, user_id se maneja via self.room.
-                
-                # Simplificación: usar self.room.getBattle() para ver si terminó
-                battle = self.room.getBattle()
-                # Si el oponente se rindió, cleanUp lo manejará, pero aquí podemos salir
-                if battle and battle.get('vencedor_id'):
-                     return None # Salir del menú
 
-                continue
+            print(f"\n{'='*70}")
+
+            # Leer opción de múltiples dígitos
+            choice = ""
+            print("\n  > ", end="", flush=True)
+            while True:
+                ch = get_key_timeout(timeout=0.5)
+                if ch is None:
+                    # Check for surrender
+                    battle = self.room.getBattle()
+                    if battle and battle.get('winner_id'):
+                        return None
+                    continue
+                if ch == '\r' or ch == '\n':
+                    print()
+                    break
+                if ch.isdigit():
+                    choice += ch
+                    print(ch, end="", flush=True)
 
             try:
-                opcion = int(opcion_str)
-                if 1 <= opcion <= len(vivos):
-                    return vivos[opcion - 1]
+                choice_int = int(choice)
+                if 1 <= choice_int <= len(vivos):
+                    return vivos[choice_int - 1]
             except:
                 pass
 
     def mochila(self, user_id, items_used=0):
         from src.database.items import items
-        from src.utils.visuals import get_key
+        from src.utils.visuals import get_key_timeout
         inventory = items().getUserItems(user_id)
-        
+
         while True:
             clear_screen()
             print(f"{'='*70}")
             print(f"{'MOCHILA ' + f'({items_used}/5)':^70}")
             print(f"{'='*70}\n")
-            
+
             if not inventory:
                 print("    (No tienes objetos disponibles)")
                 time.sleep(1.5)
                 return None
-            
+
             for i, inv in enumerate(inventory):
                 it = inv['item']
                 print(f"   [{i+1}] {it.nombre:<15} x{inv['cantidad']} - {it.descripcion}")
-            
+
             print(f"\n   [0] VOLVER")
             print(f"\n{'='*70}")
-            
-            opcion_str = get_key_timeout(timeout=0.5)
-            if opcion_str is None:
-                # Check for surrender
-                battle = self.room.getBattle()
-                if battle and battle.get('vencedor_id'):
-                    return None
-                continue
+
+            # Leer opción de múltiples dígitos
+            choice = ""
+            print("\n  > ", end="", flush=True)
+            while True:
+                ch = get_key_timeout(timeout=0.5)
+                if ch is None:
+                    # Check for surrender
+                    battle = self.room.getBattle()
+                    if battle and battle.get('winner_id'):
+                        return None
+                    continue
+                if ch == '\r' or ch == '\n':
+                    print()
+                    break
+                if ch == '0' and len(choice) == 0:
+                    choice = '0'
+                    print("0")
+                    break
+                if ch.isdigit():
+                    choice += ch
+                    print(ch, end="", flush=True)
 
             try:
-                choice = int(opcion_str)
-                if choice == 0:
+                choice_int = int(choice)
+                if choice_int == 0:
                     return None
-                if 1 <= choice <= len(inventory):
-                    return inventory[choice - 1]['item']
+                if 1 <= choice_int <= len(inventory):
+                    return inventory[choice_int - 1]['item']
             except:
                 pass

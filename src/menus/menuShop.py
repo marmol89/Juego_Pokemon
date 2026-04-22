@@ -40,9 +40,26 @@ class menuShop:
             print(f"\n{'='*70}")
             print("  [ID] Comprar objeto  [0] Salir")
             print(f"{'='*70}")
-            
-            from src.utils.visuals import get_key
-            choice = get_key()
+
+            # Leer ID de compra (múltiples dígitos + Enter)
+            choice = ""
+            print("\n  > ", end="", flush=True)
+            while True:
+                from src.utils.visuals import get_key_timeout
+                ch = get_key_timeout(timeout=0.5)
+                if ch is None:
+                    continue
+                if ch == '\r' or ch == '\n':
+                    print()  # Nueva línea
+                    break
+                if ch == '0' and len(choice) == 0:
+                    # Solo salir si presiona 0 inmediatamente
+                    choice = '0'
+                    print("0")
+                    break
+                if ch.isdigit():
+                    choice += ch
+                    print(ch, end="", flush=True)
             
             if choice == "0":
                 break
