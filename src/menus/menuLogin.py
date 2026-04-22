@@ -3,6 +3,7 @@ from src.database.rooms import rooms
 from src.Controllers.roomController import roomController
 from src.database.battles import battles
 from src.utils.clear_screen import clear_screen
+from src.Controllers.matchmakingController import MatchmakingController
 
 class menuLogin:
 
@@ -12,6 +13,7 @@ class menuLogin:
         self.roomsdb = rooms()
         self.roomcr = roomController()
         self.battlesdb = battles()
+        self.matchmaking = MatchmakingController()
         clear_screen()
 
     def inicio(self):
@@ -27,7 +29,8 @@ class menuLogin:
         print("  Opciones:")
         print("    [1] Crear Sala")
         print("    [2] Unirte a una Sala")
-        print("    [3] Tienda")
+        print("    [3] Buscar Partida")
+        print("    [4] Tienda")
         print("    [0] Cerrar Sesión\n")
         from src.utils.visuals import get_key
         print(f"{'='*50}")
@@ -44,6 +47,9 @@ class menuLogin:
             clear_screen()
             self.joinRoom()
         if optionI == '3':
+            clear_screen()
+            self.searchMatch()
+        if optionI == '4':
             clear_screen()
             self.openShop()
 
@@ -128,4 +134,75 @@ class menuLogin:
                         break
                 except:
                     pass
+        clear_screen()
+
+    def searchMatch(self):
+        """Handle matchmaking queue entry."""
+        from src.utils.visuals import get_key
+        from src.utils.clear_screen import clear_screen
+        import time
+        
+        print(f"{'='*50}")
+        print(f"{'BUSCAR PARTIDA':^50}")
+        print(f"{'='*50}\n")
+        
+        success, message, entry_id = self.matchmaking.join_queue(self.user)
+        
+        if not success:
+            print(f"  [!] {message}\n")
+            print("  Presiona cualquier tecla para volver...")
+            get_key()
+            return
+        
+        print(f"  [+] {message}")
+        print("  Timer: 0s\n")
+        print("  Opciones:")
+        print("    [C] Cancelar\n")
+        print(f"{'='*50}")
+        
+        start_time = time.time()
+        while True:
+            # Check queue status
+            status = self.matchmaking.get_status(self.user)
+            
+            if status is None or not status.is_waiting():
+                break
+            
+            elapsed = int(time.time() - start_time)
+            # Re-print with updated timer
+            print(f"\r  Buscando... {elapsed}s", end="", flush=True)
+            
+            # Check for key press (non-blocking)
+            key = get_key(timeout=1)
+            if key and key.lower() == 'c':
+                self.matchmaking.leave_queue(self.user)
+                print("\n  [-] Búsqueda cancelada")
+                time.sleep(1)
+                return
+            
+            # Check for match (room_id should be set now)
+            if status.room_id:
+                print(f"\n\n  [!] ¡Partida encontrada! Room ID: {status.room_id}")
+                print("  Presiona cualquier tecla para continuar...")
+                get_key()
+                # Transition to combat
+                self._enter_match_combat(status.room_id)
+                return
+            
+            # Check timeout
+            if elapsed >= 60:
+                print("\n\n  [!] No se encontró rival. Intenta crear una sala.")
+                time.sleep(2)
+                return
+        
+        # If we exit loop without match, just return
+        print()
+    
+    def _enter_match_combat(self, room_id):
+        """Transition to combat after a match is found."""
+        from src.Controllers.roomController import roomController
+        room = self.roomsdb.getRoom(room_id)
+        if room:
+            self.roomcr.user = self.user
+            self.roomcr.combrobarRoomEspera(room)
         clear_screen()
