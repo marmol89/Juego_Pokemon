@@ -2,18 +2,18 @@ import unittest
 from unittest.mock import patch, MagicMock
 
 from src.models.pokemon import pokemon
-from src.utils.combat.damage import calcular_dano, obtener_multiplicador
+from src.utils.combat.damage import calculate_damage, obtener_multiplicador
 
 
 class TestBattle(unittest.TestCase):
 
     def test_damage_calculation(self):
-        # Mock pokemon stats and test damage formula
+        # Test damage formula using calculate_damage
         attack = 50
         defense = 30
         power = 90
-        expected_damage = ((attack / defense) * power) / 2
-        result = calcular_dano(attack, defense, power)
+        expected_damage = max(1, int((attack / defense) * power * 0.5))
+        result = calculate_damage(base_power=power, attack=attack, defense=defense)
         self.assertEqual(result, expected_damage)
 
     def test_effectiveness_fire_vs_grass(self):

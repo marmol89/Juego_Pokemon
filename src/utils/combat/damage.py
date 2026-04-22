@@ -1,24 +1,17 @@
-def calculate_damage(attacker, defender, move_power):
+def calculate_damage(base_power, attack, defense, type_multiplier=1.0, stab_bonus=1.0):
     """
-    Calcula el daño infligido basándose en las estadísticas del atacante y defensor.
-    Fórmula: max(1, int((Atk / Def) * Poder * 0.5))
-    """
-    if defender.defensa <= 0:
-        # Evitar división por cero
-        return max(1, int(attacker.ataque * move_power * 0.5))
-        
-    dmg = int((attacker.ataque / defender.defensa) * move_power * 0.5)
-    return max(1, dmg)
-
-
-def calcular_dano(attack: float, defense: float, power: float) -> float:
-    """
-    Calculates damage based on attack, defense and power.
-    Formula: ((attack / defense) * power) / 2
+    Calculates damage based on attack, defense, base power, type effectiveness, and STAB.
+    Formula: max(1, int((attack / defense) * base_power * 0.5 * type_multiplier * stab_bonus))
     """
     if defense <= 0:
-        return max(1, (attack * power) / 2)
-    return ((attack / defense) * power) / 2
+        # Avoid division by zero
+        base_damage = max(1, int(attack * base_power * 0.5))
+    else:
+        base_damage = int((attack / defense) * base_power * 0.5)
+        base_damage = max(1, base_damage)
+    
+    final_damage = int(base_damage * type_multiplier * stab_bonus)
+    return max(1, final_damage)
 
 
 # Type effectiveness chart

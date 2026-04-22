@@ -132,8 +132,25 @@ class battleController:
                     if def_team.vida <= 0: continue
 
                     type_text(f"\n{p['user'].username} usa {m['nombre']}!")
-                    from src.utils.combat.damage import calculate_damage
-                    dmg = calculate_damage(pok, def_pok, m['poder'])
+                    from src.utils.combat.damage import calculate_damage, obtener_multiplicador
+                    
+                    # Calculate type multiplier
+                    attack_type = m.get('tipo', '').lower()
+                    defense_types = def_pok.tipos if isinstance(def_pok.tipos, list) else []
+                    type_multiplier = 1.0
+                    for def_type in defense_types:
+                        type_multiplier *= obtener_multiplicador(attack_type, def_type.lower())
+                    
+                    # Calculate STAB bonus (1.5 if attacker type matches move type)
+                    attacker_types = pok.tipos if isinstance(pok.tipos, list) else []
+                    stab_bonus = 1.0
+                    move_type_lower = attack_type
+                    for atk_type in attacker_types:
+                        if atk_type.lower() == move_type_lower:
+                            stab_bonus = 1.5
+                            break
+                    
+                    dmg = calculate_damage(m['poder'], pok.ataque, def_pok.defensa, type_multiplier, stab_bonus)
                     
                     vida_antes = def_team.vida
                     def_team.vida = max(0, def_team.vida - dmg)
@@ -187,15 +204,20 @@ class battleController:
             menuBattle(self.room).victoria(self.user, self.enemy, self.userTeam, self.enemyTeam)
             self.cleanUp(ganador=True)
 
-    def cleanUp(self, ganador=False):
+    def _calculate_scoring(self, winner):
+        """
+        Calculates and updates the scoring for battle outcome.
+        
+        Args:
+            winner: Boolean indicating if the user won the battle
+        """
         from src.database.users import users
         userdb = users()
         
         puntos_actuales = self.user.puntos
-        puntos_finales = puntos_actuales
         res_puntos = 0
 
-        if ganador:
+        if winner:
             pokemon_vivos = len([t for t in self.userTeam if t.vida > 0])
             res_puntos = 20 + (pokemon_vivos * 5)
             print(f"\n  ¡HAS GANADO! +{res_puntos} puntos de ranking.")
@@ -203,20 +225,29 @@ class battleController:
             pokemon_derrotados_enemigo = len([t for t in self.enemyTeam if t.vida <= 0])
             res_puntos = -10
             if pokemon_derrotados_enemigo == 0:
-                res_puntos -= 5 # Penalización por no matar ninguno
+                res_puntos -= 5
             print(f"\n  HAS PERDIDO. {res_puntos} puntos de ranking.")
 
-        puntos_finales += res_puntos
+        puntos_finales = puntos_actuales + res_puntos
         userdb.updatePuntos(self.user.id, puntos_finales)
-
         print(f"  Puntuación total: {puntos_finales} puntos.")
-        print("\nBatalla terminada. Volviendo al menú en 5 segundos...")
-        time.sleep(5)
-        
+        return res_puntos
+    
+    def _cleanup_battle(self):
+        """
+        Performs cleanup operations after the battle ends.
+        Only the room creator performs cleanup (deletes the room).
+        """
         if self.room.user_id == self.user.id:
             from src.database.rooms import rooms
             roomsdb = rooms()
             roomsdb.deleteRoom(self.room.id)
+    
+    def cleanUp(self, ganador=False):
+        print("\nBatalla terminada. Volviendo al menú en 5 segundos...")
+        time.sleep(5)
+        self._calculate_scoring(ganador)
+        self._cleanup_battle()
             
 
     def updateTeams(self):
