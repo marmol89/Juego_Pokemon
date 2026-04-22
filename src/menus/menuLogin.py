@@ -235,11 +235,18 @@ class menuLogin:
         from src.Controllers.roomController import roomController
         from src.utils.visuals import get_key
         from src.database.db import db
-        print(f"\n  [DEBUG] Entering match combat, room_id={room_id}")
-        # Debug: check DB directly
-        dbp = db().get_connection()
-        data = dbp.table("rooms").select("*").eq("id", room_id).execute()
-        print(f"  [DEBUG] Rooms query result: {data.data}")
+        import psycopg2
+        print(f"\n  [DEBUG] Entering match combat, room_id={room_id}, type={type(room_id)}")
+        # Debug: check DB directly with psycopg2
+        dbp = db()
+        conn_str = dbp._build_pg_connection_string()
+        conn = psycopg2.connect(conn_str)
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, user_id, enemigo_id, nombre, estado FROM rooms WHERE id = %s", (int(room_id),))
+        print(f"  [DEBUG] Rooms direct query result: {cursor.fetchall()}")
+        cursor.execute("SELECT id, user_id, enemigo_id, nombre, estado FROM rooms LIMIT 5")
+        print(f"  [DEBUG] All rooms: {cursor.fetchall()}")
+        conn.close()
         room = self.roomsdb.getRoom(room_id)
         if room:
             print(f"  [DEBUG] Room found: estado={room.estado}, user_id={room.user_id}, enemigo_id={room.enemigo_id}")

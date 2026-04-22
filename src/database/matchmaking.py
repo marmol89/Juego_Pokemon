@@ -193,6 +193,7 @@ class MatchmakingDAO:
             candidate_id = candidate[3]
 
             # Step 3: Create room and update both entries
+            print(f"  [DEBUG find_match] Creating room: user_id={user_id}, enemigo_id={matched_user_id}, nombre=Match_{entry_id}_{candidate_id}")
             cursor.execute(
                 """
                 INSERT INTO rooms (user_id, enemigo_id, nombre, estado)
@@ -202,6 +203,7 @@ class MatchmakingDAO:
                 (user_id, matched_user_id, f"Match_{entry_id}_{candidate_id}")
             )
             room_id = cursor.fetchone()[0]
+            print(f"  [DEBUG find_match] Room created with id={room_id}")
 
             # Step 4: Update candidate entry to 'matched' with room_id
             cursor.execute(
