@@ -97,7 +97,10 @@ class MatchmakingController:
         Returns:
             Room ID if match found, None otherwise
         """
-        return self.dao.find_match(entry_id, user_id, rating, rating_diff_max)
+        result = self.dao.find_match(entry_id, user_id, rating, rating_diff_max)
+        if result:
+            return int(result[1])  # result is (matched_user_id, room_id_str)
+        return None
 
     def get_status(self, user) -> Optional[object]:
         """
