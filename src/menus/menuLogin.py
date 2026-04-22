@@ -32,6 +32,7 @@ class menuLogin:
         print("    [2] Unirte a una Sala")
         print("    [3] Buscar Partida")
         print("    [4] Tienda")
+        print("    [5] Mi Equipo")
         print("    [0] Cerrar Sesión\n")
         from src.utils.visuals import get_key
         print(f"{'='*50}")
@@ -53,10 +54,17 @@ class menuLogin:
         if optionI == '4':
             clear_screen()
             self.openShop()
+        if optionI == '5':
+            clear_screen()
+            self.openMyTeam()
 
     def openShop(self):
         from src.menus.menuShop import menuShop
         menuShop(self.user).mostrar()
+
+    def openMyTeam(self):
+        from src.menus.menuMyTeam import menuMyTeam
+        menuMyTeam(self.user).manage()
 
     def logout(self):
         self.user = None

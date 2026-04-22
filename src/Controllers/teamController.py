@@ -12,10 +12,21 @@ class teamController:
         self.teamdb = teams()
     
     def inicio(self):
-        teams = self.menu.selecionar(self.user)
+        # Check if user already has a global team (room_id = 0) - used in matchmaking
+        global_team = self.teamdb.getGlobalTeam(self.user.id)
 
-        for team in teams:
-            self.teamdb.createTeam(team)
+        if global_team:
+            # Copy global team to this room with correct room_id
+            self.teamdb.copyGlobalTeamToRoom(self.user.id, self.room.id)
+            # Get the newly created team entries for this room
+            from src.database.teams import teams as TeamsDB
+            teamsdb = TeamsDB()
+            teams = teamsdb.getTeamByRoomAndUser(self.room.id, self.user.id)
+        else:
+            # No global team, show team selection UI
+            teams = self.menu.selecionar(self.user)
+            for team in teams:
+                self.teamdb.createTeam(team)
     
 
         battlesdb = battles()
