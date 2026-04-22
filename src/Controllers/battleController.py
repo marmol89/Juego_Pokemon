@@ -67,13 +67,26 @@ class battleController:
 
             movCS.insertMovement(self.room.id, userPokemon.id, move['nombre'], json.dumps(move))
             
-            print("Esperando la acción del oponente...")
-            opponentMoveRow = None
-            while opponentMoveRow is None:
-                opponentMoveRow = movCS.getMovement(self.room.id, enemyPokemon.id)
-                time.sleep(1)
-                
-            opponentMove = json.loads(opponentMoveRow['efecto'])
+            # Usar getLatestMovement para obtener solo el movimiento más reciente
+            latest_movs = movCS.getLatestMovements(self.room.id, 2)
+            opponentMove = None
+            for m in latest_movs:
+                if m['pokemon_id'] == enemyPokemon.id:
+                    opponentMove = json.loads(m['efecto'])
+                    movCS.deleteMovement(m['id'])
+                    break
+
+            if opponentMove is None:
+                # Seguir esperando si no hay movimiento del oponente
+                while opponentMove is None:
+                    latest_movs = movCS.getLatestMovements(self.room.id, 10)
+                    for m in latest_movs:
+                        if m['pokemon_id'] == enemyPokemon.id:
+                            opponentMove = json.loads(m['efecto'])
+                            movCS.deleteMovement(m['id'])
+                            break
+                    if opponentMove is None:
+                        time.sleep(0.5)
             
             # --- DETECTAR RENDICIÓN DEL OPONENTE ---
             if opponentMove.get("tipo_accion") == "surrender":
@@ -169,6 +182,10 @@ class battleController:
             my_move_row = movCS.getMovement(self.room.id, userPokemon.id)
             if my_move_row:
                 movCS.deleteMovement(my_move_row['id'])
+
+            opp_move_row = movCS.getMovement(self.room.id, enemyPokemon.id)
+            if opp_move_row:
+                movCS.deleteMovement(opp_move_row['id'])
             time.sleep(1.5)
             
             if activeUserTeam.vida <= 0:

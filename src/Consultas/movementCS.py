@@ -26,3 +26,9 @@ class movementCS:
         if not self.dbp: return False
         res = self.dbp.table("movements").delete().eq("id", movement_id).execute()
         return len(res.data) > 0
+
+    def getLatestMovements(self, room_id, limit=10):
+        """Get the most recent movements for a room, ordered by id descending."""
+        if not self.dbp: return []
+        res = self.dbp.table("movements").select("*").eq("room_id", room_id).order("id", desc=True).limit(limit).execute()
+        return res.data if res.data else []
