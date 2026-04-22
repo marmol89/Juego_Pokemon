@@ -35,9 +35,9 @@ class teams:
         return True
 
     def getGlobalTeam(self, user_id):
-        """Get user's global team (room_id = 0) and return as Team objects."""
+        """Get user's global team (room_id IS NULL) and return as Team objects."""
         if not self.dbp: return None
-        data = self.dbp.table("teams").select("*").eq("user_id", user_id).eq("room_id", 0).execute()
+        data = self.dbp.table("teams").select("*").eq("user_id", user_id).is_("room_id", None).execute()
         if len(data.data) == 0: return None
         return [Team(row['id'], row['room_id'], row['user_id'], row['pokemon_id'], row['active'], row['vida'], row['efecto']) for row in data.data]
 

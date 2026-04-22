@@ -130,7 +130,7 @@ class menuMyTeam:
                             print("  [!] Ya has seleccionado a este Pokémon.")
                             time.sleep(1)
                             continue
-                        team_entry = Team(None, 0, self.user.id, pokemon.id, 1 if len(selected) == 0 else 0, pokemon.puntos_de_salud, None)
+                        team_entry = Team(None, None, self.user.id, pokemon.id, 1 if len(selected) == 0 else 0, pokemon.puntos_de_salud, None)
                         selected.append(team_entry)
                         print(f"\n  [+] ¡{pokemon.nombre.upper()} se ha unido a tu equipo!")
                         time.sleep(1)
