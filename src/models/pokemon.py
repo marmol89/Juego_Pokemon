@@ -56,3 +56,7 @@ class pokemon:
         if self._puntos_de_salud <= 0:
             self._puntos_de_salud = 0
         return self._puntos_de_salud
+
+    def ha_perdido(self):
+        """Returns True if the pokemon has fainted (HP <= 0)."""
+        return self._puntos_de_salud <= 0
