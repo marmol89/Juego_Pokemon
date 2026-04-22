@@ -205,6 +205,12 @@ class MatchmakingDAO:
             room_id = cursor.fetchone()[0]
             print(f"  [DEBUG find_match] Room created with id={room_id}")
 
+            # Step 3.5: Create battle record for this room
+            from src.database.db import db as db_class
+            dbp = db_class().get_connection()
+            dbp.table("battles").insert({"room_id": room_id}).execute()
+            print(f"  [DEBUG find_match] Battle record created for room {room_id}")
+
             # Step 4: Update candidate entry to 'matched' with room_id
             cursor.execute(
                 """
