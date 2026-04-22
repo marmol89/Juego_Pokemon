@@ -17,6 +17,7 @@ class menuLogin:
         clear_screen()
 
     def inicio(self):
+        clear_screen()
         # Recargar el usuario para tener los puntos al día
         from src.database.users import users
         self.user = users().getUser(self.user.id)
