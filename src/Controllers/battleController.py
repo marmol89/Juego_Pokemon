@@ -245,7 +245,7 @@ class battleController:
                 res_puntos -= 5
             print(f"\n  HAS PERDIDO. {res_puntos} puntos de ranking.")
 
-        puntos_finales = puntos_actuales + res_puntos
+        puntos_finales = max(0, puntos_actuales + res_puntos)
         userdb.updatePuntos(self.user.id, puntos_finales)
         print(f"  Puntuación total: {puntos_finales} puntos.")
         return res_puntos
