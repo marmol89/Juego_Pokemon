@@ -188,6 +188,17 @@ class menuLogin:
                 self._enter_match_combat(room_id)
                 return
 
+            # Also check if we were already matched by another player's try_match
+            status = self.matchmaking.get_status(self.user)
+            if status and status.room_id:
+                room_id = int(status.room_id)
+                print(f"\n\n  [!] ¡Partida encontrada! Room ID: {room_id}")
+                print("  Presiona cualquier tecla para continuar...")
+                get_key()
+                # Transition to combat
+                self._enter_match_combat(room_id)
+                return
+
             # Check for key press (non-blocking)
             key = get_key(timeout=1)
             if key and key.lower() == 'c':
