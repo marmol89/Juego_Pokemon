@@ -77,7 +77,8 @@ CREATE TRIGGER on_queue_insert
 -- RLS policies would require auth.uid() which returns UUID, incompatible with
 -- the INTEGER user_id in this project's schema
 -- ============================================================================
-ALTER TABLE matchmaking_queue ENABLE ROW LEVEL SECURITY;
+-- RLS disabled - using application-level auth
+-- ALTER TABLE matchmaking_queue ENABLE ROW LEVEL SECURITY;
 
 -- RLS policies commented out due to auth.uid() incompatibility with custom auth
 -- Using application-level authorization instead
