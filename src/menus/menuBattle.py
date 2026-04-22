@@ -197,7 +197,7 @@ class menuBattle:
                 if ch is None:
                     # Check for surrender
                     battle = self.room.getBattle()
-                    if battle and battle.get('winner_id'):
+                    if battle and battle.winner_id:
                         return None
                     continue
                 if ch == '\r' or ch == '\n':
