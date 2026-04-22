@@ -234,7 +234,12 @@ class menuLogin:
         """Transition to combat after a match is found."""
         from src.Controllers.roomController import roomController
         from src.utils.visuals import get_key
+        from src.database.db import db
         print(f"\n  [DEBUG] Entering match combat, room_id={room_id}")
+        # Debug: check DB directly
+        dbp = db().get_connection()
+        data = dbp.table("rooms").select("*").eq("id", room_id).execute()
+        print(f"  [DEBUG] Rooms query result: {data.data}")
         room = self.roomsdb.getRoom(room_id)
         if room:
             print(f"  [DEBUG] Room found: estado={room.estado}, user_id={room.user_id}, enemigo_id={room.enemigo_id}")
