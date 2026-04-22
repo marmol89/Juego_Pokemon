@@ -58,12 +58,15 @@ class MatchmakingController:
         if entry_id is None:
             return (False, "No se pudo unir a la cola", None)
         
-        # Subscribe to realtime events
-        self.realtime.subscribe(str(user.id), {
-            'on_match_found': lambda room_id: self._on_match_found(user.id, room_id),
-            'on_timeout': lambda: self._on_timeout(user.id),
-            'on_cancelled': lambda: self._on_cancelled(user.id)
-        })
+        # Subscribe to realtime events (only available in async client, ignore errors in sync)
+        try:
+            self.realtime.subscribe(str(user.id), {
+                'on_match_found': lambda room_id: self._on_match_found(user.id, room_id),
+                'on_timeout': lambda: self._on_timeout(user.id),
+                'on_cancelled': lambda: self._on_cancelled(user.id)
+            })
+        except Exception:
+            pass  # Realtime not available in sync client, matching works via polling
         
         return (True, "Buscando partida...", entry_id)
     
