@@ -411,15 +411,13 @@ class MatchmakingDAO:
         conn = self._get_connection()
         try:
             cursor = conn.cursor()
-            # Delete entries where user doesn't exist anymore OR is not connected
+            # Delete entries where user doesn't exist anymore
+            # Note: auth.sessions not available with custom auth
             cursor.execute(
                 """
                 DELETE FROM matchmaking_queue
                 WHERE status = 'waiting'
-                AND (
-                    user_id NOT IN (SELECT id FROM users)
-                    OR user_id NOT IN (SELECT user_id FROM auth.sessions WHERE expires_at > now())
-                )
+                AND user_id NOT IN (SELECT id FROM users)
                 """
             )
             cleaned = cursor.rowcount

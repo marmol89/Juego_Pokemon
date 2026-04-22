@@ -27,6 +27,11 @@ CREATE INDEX IF NOT EXISTS idx_matchmaking_status_entered
     WHERE status = 'waiting';
 
 -- ============================================================================
+-- NOTE: Matchmaking logic is handled in Python (MatchmakingDAO.find_match)
+-- instead of Edge Functions or DB triggers, for better local development support
+-- ============================================================================
+
+-- ============================================================================
 -- FUNCTION: find_match_candidates(p_rating, p_rating_diff_max)
 -- Returns the best matching candidate for a given rating
 -- Ordered by smallest rating difference, then earliest entry time
@@ -43,53 +48,6 @@ BEGIN
     LIMIT 1;
 END;
 $$ LANGUAGE plpgsql;
-
--- ============================================================================
--- FUNCTION: trigger_find_match()
--- After INSERT on matchmaking_queue, invokes the find-match Edge Function
--- via net.http_request to process the new entry
--- ============================================================================
-CREATE OR REPLACE FUNCTION trigger_find_match()
-RETURNS TRIGGER AS $$
-BEGIN
-    PERFORM net.http_request(
-        url := current_setting('app.settings.supabase_url', true) || '/functions/v1/find-match',
-        method := 'POST',
-        headers := '{"Content-Type": "application/json"}'::jsonb,
-        body := jsonb_build_object('new_entry_id', NEW.id, 'user_id', NEW.user_id)::jsonb
-    );
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
--- ============================================================================
--- TRIGGER: on_queue_insert
--- Fires trigger_find_match() after each INSERT on matchmaking_queue
--- ============================================================================
-DROP TRIGGER IF EXISTS on_queue_insert ON matchmaking_queue;
-CREATE TRIGGER on_queue_insert
-    AFTER INSERT ON matchmaking_queue
-    FOR EACH ROW EXECUTE FUNCTION trigger_find_match();
-
--- ============================================================================
--- ROW LEVEL SECURITY (RLS)
--- NOTE: Disabled - project uses custom auth (bcrypt), not Supabase Auth
--- RLS policies would require auth.uid() which returns UUID, incompatible with
--- the INTEGER user_id in this project's schema
--- ============================================================================
--- RLS disabled - using application-level auth
--- ALTER TABLE matchmaking_queue ENABLE ROW LEVEL SECURITY;
-
--- RLS policies commented out due to auth.uid() incompatibility with custom auth
--- Using application-level authorization instead
--- CREATE POLICY matchmaking_queue_select_own ON matchmaking_queue
---     FOR SELECT USING (auth.uid() = user_id);
--- CREATE POLICY matchmaking_queue_insert_no_duplicates ON matchmaking_queue
---     FOR INSERT WITH CHECK (auth.uid() = user_id AND NOT EXISTS (...));
--- CREATE POLICY matchmaking_queue_update_own ON matchmaking_queue
---     FOR UPDATE USING (auth.uid() = user_id);
--- CREATE POLICY matchmaking_queue_delete_own ON matchmaking_queue
---     FOR DELETE USING (auth.uid() = user_id);
 
 -- ============================================================================
 -- FUNCTION: updated_at_trigger()

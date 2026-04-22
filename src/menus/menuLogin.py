@@ -150,37 +150,44 @@ class menuLogin:
         from src.utils.visuals import get_key
         from src.utils.clear_screen import clear_screen
         import time
-        
+
         print(f"{'='*50}")
         print(f"{'BUSCAR PARTIDA':^50}")
         print(f"{'='*50}\n")
-        
+
         success, message, entry_id = self.matchmaking.join_queue(self.user)
-        
+
         if not success:
             print(f"  [!] {message}\n")
             print("  Presiona cualquier tecla para volver...")
             get_key()
             return
-        
+
         print(f"  [+] {message}")
         print("  Timer: 0s\n")
         print("  Opciones:")
         print("    [C] Cancelar\n")
         print(f"{'='*50}")
-        
+
         start_time = time.time()
         while True:
-            # Check queue status
-            status = self.matchmaking.get_status(self.user)
-            
-            if status is None or not status.is_waiting():
-                break
-            
             elapsed = int(time.time() - start_time)
             # Re-print with updated timer
             print(f"\r  Buscando... {elapsed}s", end="", flush=True)
-            
+
+            # Try to find a match for this entry (Python-side matching instead of Edge Function)
+            rating = getattr(self.user, 'puntos', 0)
+            match_result = self.matchmaking.try_match(entry_id, str(self.user.id), rating)
+
+            if match_result:
+                room_id = match_result
+                print(f"\n\n  [!] ¡Partida encontrada! Room ID: {room_id}")
+                print("  Presiona cualquier tecla para continuar...")
+                get_key()
+                # Transition to combat
+                self._enter_match_combat(room_id)
+                return
+
             # Check for key press (non-blocking)
             key = get_key(timeout=1)
             if key and key.lower() == 'c':
@@ -188,18 +195,10 @@ class menuLogin:
                 print("\n  [-] Búsqueda cancelada")
                 time.sleep(1)
                 return
-            
-            # Check for match (room_id should be set now)
-            if status.room_id:
-                print(f"\n\n  [!] ¡Partida encontrada! Room ID: {status.room_id}")
-                print("  Presiona cualquier tecla para continuar...")
-                get_key()
-                # Transition to combat
-                self._enter_match_combat(status.room_id)
-                return
-            
+
             # Check timeout
             if elapsed >= 60:
+                self.matchmaking.leave_queue(self.user)
                 print("\n\n  [!] No se encontró rival. Intenta crear una sala.")
                 time.sleep(2)
                 return

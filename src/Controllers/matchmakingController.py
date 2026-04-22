@@ -82,7 +82,23 @@ class MatchmakingController:
         
         # Remove from queue
         return self.dao.leave_queue(str(user.id))
-    
+
+    def try_match(self, entry_id: int, user_id: str, rating: int, rating_diff_max: int = 50) -> Optional[int]:
+        """
+        Attempt to find a match for the given queue entry.
+        Called periodically from the polling loop in searchMatch.
+
+        Args:
+            entry_id: The queue entry ID
+            user_id: The user ID
+            rating: The user's rating
+            rating_diff_max: Maximum rating difference (default 50)
+
+        Returns:
+            Room ID if match found, None otherwise
+        """
+        return self.dao.find_match(entry_id, user_id, rating, rating_diff_max)
+
     def get_status(self, user) -> Optional[object]:
         """
         Get the current matchmaking status for a user.
