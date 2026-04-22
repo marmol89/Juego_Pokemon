@@ -80,8 +80,11 @@ class MatchmakingController:
         Returns:
             True if successfully left queue, False otherwise
         """
-        # Unsubscribe from realtime
-        self.realtime.unsubscribe(str(user.id))
+        # Unsubscribe from realtime (only available in async client, ignore errors)
+        try:
+            self.realtime.unsubscribe(str(user.id))
+        except Exception:
+            pass
         
         # Remove from queue
         return self.dao.leave_queue(str(user.id))
