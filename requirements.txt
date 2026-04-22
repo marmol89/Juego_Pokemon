@@ -6,3 +6,4 @@ pyinstaller
 pytest
 pillow
 bcrypt
+psycopg2-binary
