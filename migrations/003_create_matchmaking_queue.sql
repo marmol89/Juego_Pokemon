@@ -1,16 +1,17 @@
 -- Migration: 003_create_matchmaking_queue.sql
--- Creates the matchmaking queue table with RLS policies
+-- Creates the matchmaking queue table for rapid matchmaking
+-- NOTE: Uses INTEGER for user_id/room_id to match custom auth schema (not Supabase Auth UUID)
 
 -- ============================================================================
 -- TABLE: matchmaking_queue
 -- ============================================================================
 CREATE TABLE IF NOT EXISTS matchmaking_queue (
     id BIGSERIAL PRIMARY KEY,
-    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     rating INTEGER NOT NULL,
     rating_diff_max INTEGER DEFAULT 50,
     status VARCHAR(20) NOT NULL DEFAULT 'waiting',
-    room_id UUID REFERENCES rooms(id) ON DELETE SET NULL,
+    room_id INTEGER REFERENCES rooms(id) ON DELETE SET NULL,
     entered_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     CONSTRAINT valid_status CHECK (status IN ('waiting', 'matched', 'timeout', 'abandoned'))
@@ -31,7 +32,7 @@ CREATE INDEX IF NOT EXISTS idx_matchmaking_status_entered
 -- Ordered by smallest rating difference, then earliest entry time
 -- ============================================================================
 CREATE OR REPLACE FUNCTION find_match_candidates(p_rating INTEGER, p_rating_diff_max INTEGER)
-RETURNS TABLE(user_id UUID, rating INTEGER, entered_at TIMESTAMPTZ, id BIGINT) AS $$
+RETURNS TABLE(user_id INTEGER, rating INTEGER, entered_at TIMESTAMPTZ, id BIGINT) AS $$
 BEGIN
     RETURN QUERY
     SELECT mq.user_id, mq.rating, mq.entered_at, mq.id
@@ -44,7 +45,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- ============================================================================
--- TRIGGER FUNCTION: trigger_find_match()
+-- FUNCTION: trigger_find_match()
 -- After INSERT on matchmaking_queue, invokes the find-match Edge Function
 -- via net.http_request to process the new entry
 -- ============================================================================
@@ -72,43 +73,22 @@ CREATE TRIGGER on_queue_insert
 
 -- ============================================================================
 -- ROW LEVEL SECURITY (RLS)
+-- NOTE: Disabled - project uses custom auth (bcrypt), not Supabase Auth
+-- RLS policies would require auth.uid() which returns UUID, incompatible with
+-- the INTEGER user_id in this project's schema
 -- ============================================================================
 ALTER TABLE matchmaking_queue ENABLE ROW LEVEL SECURITY;
 
--- Policy: Users can only read their own queue entries
-DROP POLICY IF EXISTS matchmaking_queue_select_own ON matchmaking_queue;
-CREATE POLICY matchmaking_queue_select_own
-    ON matchmaking_queue
-    FOR SELECT
-    USING (auth.uid() = user_id);
-
--- Policy: Users can only insert if not already in 'waiting' status
--- This prevents duplicate queue entries
-DROP POLICY IF EXISTS matchmaking_queue_insert_no_duplicates ON matchmaking_queue;
-CREATE POLICY matchmaking_queue_insert_no_duplicates
-    ON matchmaking_queue
-    FOR INSERT
-    WITH CHECK (
-        auth.uid() = user_id
-        AND NOT EXISTS (
-            SELECT 1 FROM matchmaking_queue
-            WHERE user_id = auth.uid() AND status = 'waiting'
-        )
-    );
-
--- Policy: Users can only update their own entries (for status changes)
-DROP POLICY IF EXISTS matchmaking_queue_update_own ON matchmaking_queue;
-CREATE POLICY matchmaking_queue_update_own
-    ON matchmaking_queue
-    FOR UPDATE
-    USING (auth.uid() = user_id);
-
--- Policy: Users can only delete their own entries (to leave queue)
-DROP POLICY IF EXISTS matchmaking_queue_delete_own ON matchmaking_queue;
-CREATE POLICY matchmaking_queue_delete_own
-    ON matchmaking_queue
-    FOR DELETE
-    USING (auth.uid() = user_id);
+-- RLS policies commented out due to auth.uid() incompatibility with custom auth
+-- Using application-level authorization instead
+-- CREATE POLICY matchmaking_queue_select_own ON matchmaking_queue
+--     FOR SELECT USING (auth.uid() = user_id);
+-- CREATE POLICY matchmaking_queue_insert_no_duplicates ON matchmaking_queue
+--     FOR INSERT WITH CHECK (auth.uid() = user_id AND NOT EXISTS (...));
+-- CREATE POLICY matchmaking_queue_update_own ON matchmaking_queue
+--     FOR UPDATE USING (auth.uid() = user_id);
+-- CREATE POLICY matchmaking_queue_delete_own ON matchmaking_queue
+--     FOR DELETE USING (auth.uid() = user_id);
 
 -- ============================================================================
 -- FUNCTION: updated_at_trigger()
