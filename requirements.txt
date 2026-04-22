@@ -5,3 +5,4 @@ rich==14.3.4
 pyinstaller
 pytest
 pillow
+bcrypt
